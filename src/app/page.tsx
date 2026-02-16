@@ -1,8 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import { ArrowRight, Languages, Zap, Shield, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function HomePage() {
+  const isDevBypass = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
+  const primaryCTA = isDevBypass ? '/translate' : '/signup';
+  const secondaryCTA = isDevBypass ? '/dashboard' : '/login';
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -13,10 +19,12 @@ export default function HomePage() {
             <span className="text-xl font-semibold">OCR Translate</span>
           </Link>
           <nav className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="ghost">Sign in</Button>
+            <Link href={secondaryCTA}>
+              <Button variant="ghost">
+                {isDevBypass ? 'Dashboard' : 'Sign in'}
+              </Button>
             </Link>
-            <Link href="/signup">
+            <Link href={primaryCTA}>
               <Button>Get Started</Button>
             </Link>
           </nav>
@@ -37,14 +45,14 @@ export default function HomePage() {
               OCR and AI translation.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href="/signup">
+              <Link href={primaryCTA}>
                 <Button size="lg" className="gap-2">
                   Start Translating <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/login">
+              <Link href={secondaryCTA}>
                 <Button size="lg" variant="outline">
-                  Sign in to Dashboard
+                  {isDevBypass ? 'Go to Dashboard' : 'Sign in to Dashboard'}
                 </Button>
               </Link>
             </div>
@@ -95,11 +103,14 @@ export default function HomePage() {
             <div className="flex flex-col items-center text-center">
               <h2 className="text-3xl font-bold">Ready to get started?</h2>
               <p className="text-muted-foreground mt-4 max-w-xl">
-                Create your account and start translating images in minutes.
+                {isDevBypass
+                  ? 'Start translating images instantly.'
+                  : 'Create your account and start translating images in minutes.'}
               </p>
-              <Link href="/signup" className="mt-8">
+              <Link href={primaryCTA} className="mt-8">
                 <Button size="lg" className="gap-2">
-                  Create Account <ArrowRight className="h-4 w-4" />
+                  {isDevBypass ? 'Start Translating' : 'Create Account'}{' '}
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
