@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import type { TranslateResponse } from '@/types';
-import { API_BASE_URL } from '@/lib/constants';
+import { getImageUrl } from '@/lib/utils';
 
 interface TranslationResultProps {
   result: TranslateResponse;
@@ -18,13 +18,8 @@ interface TranslationResultProps {
 export function TranslationResult({ result }: TranslationResultProps) {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
-  const getFullUrl = (path: string) => {
-    if (path.startsWith('http')) return path;
-    return `${API_BASE_URL}${path}`;
-  };
-
   const copyUrl = async (url: string) => {
-    await navigator.clipboard.writeText(getFullUrl(url));
+    await navigator.clipboard.writeText(getImageUrl(url));
     setCopiedUrl(url);
     toast.success('URL copied to clipboard');
     setTimeout(() => setCopiedUrl(null), 2000);
@@ -32,7 +27,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
 
   const downloadImage = async (url: string, filename: string) => {
     try {
-      const response = await fetch(getFullUrl(url));
+      const response = await fetch(getImageUrl(url));
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -70,7 +65,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
             <div className="space-y-4">
               <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
                 <Image
-                  src={getFullUrl(result.translated_image_url)}
+                  src={getImageUrl(result.translated_image_url)}
                   alt="Translated"
                   fill
                   className="object-contain"
@@ -102,7 +97,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <a
-                    href={getFullUrl(result.translated_image_url)}
+                    href={getImageUrl(result.translated_image_url)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -118,7 +113,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
             <div className="space-y-4">
               <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
                 <Image
-                  src={getFullUrl(result.original_image_url)}
+                  src={getImageUrl(result.original_image_url)}
                   alt="Original"
                   fill
                   className="object-contain"
@@ -145,7 +140,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
               <div className="space-y-4">
                 <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
                   <Image
-                    src={getFullUrl(result.clean_image_url)}
+                    src={getImageUrl(result.clean_image_url)}
                     alt="Clean"
                     fill
                     className="object-contain"

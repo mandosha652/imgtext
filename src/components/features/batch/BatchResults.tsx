@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { BatchStatusResponse, ImageResult } from '@/types';
 import { SUPPORTED_LANGUAGES } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 interface BatchResultsProps {
   batchStatus: BatchStatusResponse;
@@ -38,7 +39,7 @@ function ImageResultCard({ image }: { image: ImageResult }) {
           {image.original_image_url ? (
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border">
               <Image
-                src={image.original_image_url}
+                src={getImageUrl(image.original_image_url)}
                 alt={image.original_filename}
                 fill
                 className="object-cover"
@@ -106,7 +107,7 @@ function ImageResultCard({ image }: { image: ImageResult }) {
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="icon-sm" asChild>
                       <a
-                        href={translation.translated_image_url!}
+                        href={getImageUrl(translation.translated_image_url!)}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -115,7 +116,7 @@ function ImageResultCard({ image }: { image: ImageResult }) {
                     </Button>
                     <Button variant="ghost" size="icon-sm" asChild>
                       <a
-                        href={translation.translated_image_url!}
+                        href={getImageUrl(translation.translated_image_url!)}
                         download={`${image.original_filename.split('.')[0]}_${translation.target_lang}.png`}
                       >
                         <Download className="h-3.5 w-3.5" />
