@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { historyStorage, type HistoryItem } from '@/lib/utils/historyStorage';
 import { SUPPORTED_LANGUAGES } from '@/types';
+import { getImageUrl } from '@/lib/utils';
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryItem[]>(() =>
@@ -289,7 +290,7 @@ function HistoryCard({
                   <p className="text-sm font-medium">Original Image</p>
                   <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
                     <Image
-                      src={item.result.original_image_url}
+                      src={getImageUrl(item.result.original_image_url)}
                       alt="Original"
                       fill
                       className="object-contain"
@@ -318,7 +319,7 @@ function HistoryCard({
                   </p>
                   <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
                     <Image
-                      src={item.result.translated_image_url}
+                      src={getImageUrl(item.result.translated_image_url)}
                       alt="Translated"
                       fill
                       className="object-contain"
@@ -448,7 +449,9 @@ function HistoryCard({
                                     <>
                                       <div className="bg-muted relative aspect-video overflow-hidden rounded border">
                                         <Image
-                                          src={translation.translated_image_url}
+                                          src={getImageUrl(
+                                            translation.translated_image_url
+                                          )}
                                           alt={`Translated to ${translation.target_lang}`}
                                           fill
                                           className="object-contain"

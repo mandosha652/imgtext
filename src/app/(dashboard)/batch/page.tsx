@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Loader2, Layers, Plus, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
@@ -23,6 +23,7 @@ import {
 } from '@/components/features/batch';
 import { useCreateBatch, useListBatches, useCancelBatch } from '@/hooks';
 import { MAX_TARGET_LANGUAGES } from '@/lib/constants';
+import { historyStorage } from '@/lib/utils/historyStorage';
 
 const MAX_CONCURRENT_BATCHES = 999; // Unlimited for personal use
 
@@ -47,6 +48,27 @@ export default function BatchPage() {
     batches?.filter(b => b.status === 'pending' || b.status === 'processing') ||
     [];
   const canCreateBatch = activeBatches.length < MAX_CONCURRENT_BATCHES;
+
+  // Track saved batches to prevent duplicate saves
+  const savedBatchIds = useRef<Set<string>>(new Set());
+
+  // Save completed batches to history
+  useEffect(() => {
+    if (!batches) return;
+
+    batches.forEach(batch => {
+      const isFinished =
+        batch.status === 'completed' ||
+        batch.status === 'partially_completed' ||
+        batch.status === 'failed' ||
+        batch.status === 'cancelled';
+
+      if (isFinished && !savedBatchIds.current.has(batch.batch_id)) {
+        savedBatchIds.current.add(batch.batch_id);
+        historyStorage.addBatchTranslation(batch, batch.target_languages);
+      }
+    });
+  }, [batches]);
 
   const handleStartBatch = async () => {
     if (files.length === 0) {
