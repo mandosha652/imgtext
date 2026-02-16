@@ -12,7 +12,9 @@ export default function DashboardLayout({
     <div className="flex min-h-screen flex-col">
       <DashboardNav />
       <main className="flex-1">
-        <div className="container mx-auto max-w-6xl px-4 py-8">{children}</div>
+        <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">
+          {children}
+        </div>
       </main>
     </div>
   );

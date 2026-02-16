@@ -107,4 +107,23 @@ export const translateApi = {
     );
     return response.data;
   },
+
+  /**
+   * List all batch jobs for the current user
+   */
+  listBatches: async (options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<BatchStatusResponse[]> => {
+    const response = await apiClient.get<BatchStatusResponse[]>(
+      ENDPOINTS.BATCH_LIST,
+      {
+        params: {
+          limit: options?.limit ?? 50,
+          offset: options?.offset ?? 0,
+        },
+      }
+    );
+    return response.data;
+  },
 };

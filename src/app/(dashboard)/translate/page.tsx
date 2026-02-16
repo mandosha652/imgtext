@@ -69,15 +69,15 @@ export default function TranslatePage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Translate Image</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl font-bold sm:text-3xl">Translate Image</h1>
+        <p className="text-muted-foreground mt-2 text-sm sm:text-base">
           Upload an image and translate text to your target language
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
         {/* Upload & Settings */}
         <Card>
           <CardHeader>

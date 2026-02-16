@@ -7,6 +7,12 @@ import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   MAX_FILE_SIZE_BYTES,
   MAX_FILE_SIZE_MB,
   MAX_BATCH_SIZE,
@@ -24,6 +30,10 @@ export function MultiImageUploader({
   disabled,
 }: MultiImageUploaderProps) {
   const [previews, setPreviews] = useState<Map<string, string>>(new Map());
+  const [previewImage, setPreviewImage] = useState<{
+    file: File;
+    preview: string;
+  } | null>(null);
 
   const generatePreview = useCallback((file: File): Promise<string> => {
     return new Promise(resolve => {
@@ -168,13 +178,18 @@ export function MultiImageUploader({
                   key={key}
                   className="group bg-muted/50 relative overflow-hidden rounded-lg border"
                 >
-                  <div className="relative aspect-square">
+                  <div
+                    className="relative aspect-square cursor-pointer"
+                    onClick={() =>
+                      preview && setPreviewImage({ file, preview })
+                    }
+                  >
                     {preview ? (
                       <Image
                         src={preview}
                         alt={file.name}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform group-hover:scale-105"
                         unoptimized
                       />
                     ) : (
@@ -201,6 +216,30 @@ export function MultiImageUploader({
           </div>
         </div>
       )}
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader className="space-y-2">
+            <DialogTitle>{previewImage?.file.name}</DialogTitle>
+            <p className="text-muted-foreground text-sm">
+              {previewImage &&
+                `${(previewImage.file.size / 1024 / 1024).toFixed(2)} MB`}
+            </p>
+          </DialogHeader>
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+            {previewImage && (
+              <Image
+                src={previewImage.preview}
+                alt={previewImage.file.name}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

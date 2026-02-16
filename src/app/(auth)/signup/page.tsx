@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,8 @@ import { AxiosError } from 'axios';
 
 function SignupForm() {
   const { registerAsync, isRegistering } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -52,15 +54,17 @@ function SignupForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-        <CardDescription>
+    <Card className="mx-4 w-full max-w-md sm:mx-0">
+      <CardHeader className="space-y-2 px-4 sm:space-y-3 sm:px-6">
+        <CardTitle className="text-xl font-bold sm:text-2xl">
+          Create an account
+        </CardTitle>
+        <CardDescription className="text-sm">
           Enter your details to create your account
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
           <div className="space-y-2">
             <Label htmlFor="name">Name (optional)</Label>
             <Input
@@ -86,13 +90,32 @@ function SignupForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              autoComplete="new-password"
-              {...register('password')}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Create a password"
+                autoComplete="new-password"
+                {...register('password')}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
+                ) : (
+                  <Eye className="text-muted-foreground h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {showPassword ? 'Hide password' : 'Show password'}
+                </span>
+              </Button>
+            </div>
             {errors.password && (
               <p className="text-destructive text-sm">
                 {errors.password.message}
@@ -101,13 +124,32 @@ function SignupForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm your password"
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
+                ) : (
+                  <Eye className="text-muted-foreground h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {showConfirmPassword ? 'Hide password' : 'Show password'}
+                </span>
+              </Button>
+            </div>
             {errors.confirmPassword && (
               <p className="text-destructive text-sm">
                 {errors.confirmPassword.message}
@@ -115,12 +157,12 @@ function SignupForm() {
             )}
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+        <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
           <Button type="submit" className="w-full" disabled={isRegistering}>
             {isRegistering && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create account
           </Button>
-          <p className="text-muted-foreground text-center text-sm">
+          <p className="text-muted-foreground text-center text-xs sm:text-sm">
             Already have an account?{' '}
             <Link href="/login" className="text-primary hover:underline">
               Sign in
@@ -136,7 +178,7 @@ export default function SignupPage() {
   return (
     <Suspense
       fallback={
-        <Card className="w-full max-w-md">
+        <Card className="mx-4 w-full max-w-md sm:mx-0">
           <CardContent className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin" />
           </CardContent>

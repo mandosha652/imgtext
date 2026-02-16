@@ -12,20 +12,24 @@ export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+      <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-xl font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold sm:text-xl">
+              OCR Translate
+            </span>
           </Link>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
             <Link href={secondaryCTA}>
-              <Button variant="ghost">
+              <Button variant="ghost" size="sm" className="sm:size-default">
                 {isDevBypass ? 'Dashboard' : 'Sign in'}
               </Button>
             </Link>
             <Link href={primaryCTA}>
-              <Button>Get Started</Button>
+              <Button size="sm" className="sm:size-default">
+                Get Started
+              </Button>
             </Link>
           </nav>
         </div>
@@ -77,10 +81,10 @@ export default function HomePage() {
                 <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
                   <Globe className="text-primary h-6 w-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">18+ Languages</h3>
+                <h3 className="mt-4 text-lg font-semibold">11 Languages</h3>
                 <p className="text-muted-foreground mt-2">
-                  Support for major world languages including English, Spanish,
-                  Japanese, Chinese, and more.
+                  Support for major European languages including English,
+                  German, French, Spanish, Italian, and more.
                 </p>
               </div>
               <div className="flex flex-col items-center text-center">
@@ -120,13 +124,13 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t">
-        <div className="container mx-auto max-w-6xl px-4 py-8">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+        <div className="container mx-auto max-w-6xl px-4 py-6 sm:py-8">
+          <div className="flex flex-col items-center justify-between gap-3 sm:gap-4 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
               <span className="font-semibold">OCR Translate</span>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-center text-xs sm:text-sm">
               &copy; {new Date().getFullYear()} OCR Translate. All rights
               reserved.
             </p>
