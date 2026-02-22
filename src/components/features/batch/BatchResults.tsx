@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import JSZip from 'jszip';
 import { format } from 'date-fns';
 import {
@@ -20,6 +21,11 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { BatchStatusResponse, BatchStatus, ImageResult } from '@/types';
 import { SUPPORTED_LANGUAGES } from '@/types';
 import { cn, getImageUrl } from '@/lib/utils';
@@ -159,41 +165,67 @@ function ImageResultCard({
           </div>
         </div>
 
-        {expanded && successfulTranslations.length > 0 && (
-          <div className="bg-muted/30 border-t px-4 py-3">
-            <div className="space-y-2">
-              {successfulTranslations.map(translation => (
-                <div
-                  key={translation.target_lang}
-                  className="flex items-center justify-between gap-3"
-                >
-                  <Badge variant="outline" className="text-xs">
-                    {getLanguageName(translation.target_lang)}
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a
-                        href={getImageUrl(translation.translated_image_url!)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
-                    <Button variant="ghost" size="icon-sm" asChild>
-                      <a
-                        href={getImageUrl(translation.translated_image_url!)}
-                        download={`${image.original_filename.split('.')[0]}_${translation.target_lang}.png`}
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
-                  </div>
+        <AnimatePresence initial={false}>
+          {expanded && successfulTranslations.length > 0 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <div className="bg-muted/30 border-t px-4 py-3">
+                <div className="space-y-2">
+                  {successfulTranslations.map(translation => (
+                    <div
+                      key={translation.target_lang}
+                      className="flex items-center justify-between gap-3"
+                    >
+                      <Badge variant="outline" className="text-xs">
+                        {getLanguageName(translation.target_lang)}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon-sm" asChild>
+                              <a
+                                href={getImageUrl(
+                                  translation.translated_image_url!
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Open in new tab"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </a>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Open in new tab</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon-sm" asChild>
+                              <a
+                                href={getImageUrl(
+                                  translation.translated_image_url!
+                                )}
+                                download={`${image.original_filename.split('.')[0]}_${translation.target_lang}.png`}
+                                aria-label="Download image"
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                              </a>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Download image</TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
     </Card>
   );
@@ -347,67 +379,80 @@ export function BatchResults({ batchStatus }: BatchResultsProps) {
       </CardHeader>
 
       {/* Expanded detail */}
-      {expanded && (
-        <CardContent className="pt-4">
-          {completedImages.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                Completed ({completedImages.length})
-              </p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {completedImages.map(image => (
-                  <ImageResultCard key={image.image_id} image={image} />
-                ))}
-              </div>
-            </div>
-          )}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <CardContent className="pt-4">
+              {completedImages.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                    Completed ({completedImages.length})
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {completedImages.map(image => (
+                      <ImageResultCard key={image.image_id} image={image} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {failedImages.length > 0 && (
-            <div
-              className={cn('space-y-3', completedImages.length > 0 && 'mt-5')}
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                  Failed ({failedImages.length})
-                </p>
-                {failedImages.length > 1 && (
-                  <button
-                    onClick={() =>
-                      failedImages.forEach(img => handleRetry(img.image_id))
-                    }
-                    disabled={retryImage.isPending}
-                    className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 flex cursor-pointer items-center gap-1.5 rounded text-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <RefreshCw className="h-3 w-3" />
-                    Retry all
-                  </button>
-                )}
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {failedImages.map(image => (
-                  <ImageResultCard
-                    key={image.image_id}
-                    image={image}
-                    onRetry={() => handleRetry(image.image_id)}
-                    isRetrying={
-                      retryImage.isPending &&
-                      retryImage.variables?.imageId === image.image_id
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+              {failedImages.length > 0 && (
+                <div
+                  className={cn(
+                    'space-y-3',
+                    completedImages.length > 0 && 'mt-5'
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Failed ({failedImages.length})
+                    </p>
+                    {failedImages.length > 1 && (
+                      <button
+                        onClick={() =>
+                          failedImages.forEach(img => handleRetry(img.image_id))
+                        }
+                        disabled={retryImage.isPending}
+                        className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 flex cursor-pointer items-center gap-1.5 rounded text-xs transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                        Retry all
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {failedImages.map(image => (
+                      <ImageResultCard
+                        key={image.image_id}
+                        image={image}
+                        onRetry={() => handleRetry(image.image_id)}
+                        isRetrying={
+                          retryImage.isPending &&
+                          retryImage.variables?.imageId === image.image_id
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          <div className="mt-4 flex justify-end border-t pt-3">
-            <Link href="/history">
-              <Button variant="ghost" size="sm" className="text-xs">
-                View in History →
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      )}
+              <div className="mt-4 flex justify-end border-t pt-3">
+                <Link href="/history">
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    View in History →
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Card>
   );
 }

@@ -6,6 +6,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -149,11 +150,32 @@ export function MultiImageUploader({
       </div>
 
       {fileRejections.length > 0 && (
-        <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-lg p-3 text-sm">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          <span>
-            {fileRejections.length} file(s) rejected (too large or wrong format)
-          </span>
+        <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">
+          <div className="mb-1.5 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span className="font-medium">
+              {fileRejections.length} file
+              {fileRejections.length !== 1 ? 's' : ''} rejected
+            </span>
+          </div>
+          <ul className="ml-6 space-y-0.5">
+            {fileRejections.slice(0, 3).map(({ file, errors }) => (
+              <li key={file.name} className="text-xs">
+                <span className="font-medium">{file.name}</span>
+                {' — '}
+                {errors[0]?.code === 'file-too-large'
+                  ? `too large (max ${MAX_FILE_SIZE_MB}MB)`
+                  : errors[0]?.code === 'file-invalid-type'
+                    ? 'unsupported format (JPEG, PNG, WebP only)'
+                    : (errors[0]?.message ?? 'rejected')}
+              </li>
+            ))}
+            {fileRejections.length > 3 && (
+              <li className="text-xs opacity-70">
+                +{fileRejections.length - 3} more
+              </li>
+            )}
+          </ul>
         </div>
       )}
 
@@ -199,15 +221,15 @@ export function MultiImageUploader({
                         unoptimized
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <ImageIcon className="text-muted-foreground h-8 w-8" />
-                      </div>
+                      <Skeleton className="absolute inset-0 rounded-none" />
                     )}
                   </div>
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-1 right-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label={`Remove ${file.name}`}
+                    title={`Remove ${file.name}`}
+                    className="absolute top-1 right-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                     onClick={() => removeFile(index)}
                     disabled={disabled}
                   >

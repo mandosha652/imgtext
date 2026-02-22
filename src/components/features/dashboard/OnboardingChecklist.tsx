@@ -9,6 +9,7 @@ import {
   Layers,
   Key,
   BookOpen,
+  X,
 } from 'lucide-react';
 import {
   Card,
@@ -23,6 +24,7 @@ import { useApiKeys } from '@/hooks';
 import type { UsageStatsResponse } from '@/types';
 
 const DOCS_KEY = 'onboarding_docs_read';
+const DISMISSED_KEY = 'onboarding_dismissed';
 
 interface Step {
   id: string;
@@ -79,6 +81,10 @@ export function OnboardingChecklist({ usage }: Props) {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(DOCS_KEY) === 'true';
   });
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(DISMISSED_KEY) === 'true';
+  });
 
   const completed: Record<string, boolean> = {
     translate: (usage.all_time.translations_count ?? 0) > 0,
@@ -95,7 +101,42 @@ export function OnboardingChecklist({ usage }: Props) {
     setDocsRead(true);
   }
 
-  if (allDone) return null;
+  function handleDismiss() {
+    localStorage.setItem(DISMISSED_KEY, 'true');
+    setDismissed(true);
+  }
+
+  if (dismissed) return null;
+
+  if (allDone) {
+    return (
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CheckCircle2 className="text-primary h-4 w-4" />
+                You&apos;re all set!
+              </CardTitle>
+              <CardDescription className="mt-0.5">
+                All getting started steps complete
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              aria-label="Dismiss"
+              onClick={handleDismiss}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <Progress value={100} className="mt-3 h-1.5" />
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-primary/20 bg-primary/5">

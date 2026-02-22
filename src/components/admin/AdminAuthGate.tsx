@@ -67,6 +67,7 @@ export function AdminAuthGate({ onAuthenticated }: AdminAuthGateProps) {
                   variant="ghost"
                   size="icon"
                   className="absolute top-0 right-0 h-full px-3"
+                  aria-label={showKey ? 'Hide key' : 'Show key'}
                   onClick={() => setShowKey(!showKey)}
                 >
                   {showKey ? (

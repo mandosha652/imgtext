@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -10,6 +11,8 @@ import {
   LogOut,
   Moon,
   Sun,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -27,6 +30,7 @@ export function AdminNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
     adminKeyStorage.clear();
@@ -71,6 +75,7 @@ export function AdminNav() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Toggle theme"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           >
             <Sun className="h-5 w-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
@@ -81,13 +86,69 @@ export function AdminNav() {
             variant="ghost"
             size="sm"
             onClick={handleLogout}
-            className="text-muted-foreground gap-2"
+            className="text-muted-foreground hidden gap-2 md:flex"
           >
             <LogOut className="h-4 w-4" />
             Exit Admin
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMobileOpen(v => !v)}
+          >
+            {mobileOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
+          </Button>
         </div>
       </div>
+
+      {/* Mobile nav */}
+      {mobileOpen && (
+        <div className="animate-in slide-in-from-top-2 border-t duration-200 md:hidden">
+          <nav className="container mx-auto max-w-7xl space-y-1 px-4 py-3">
+            {navItems.map(item => {
+              const isActive = item.exact
+                ? pathname === item.href
+                : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      'w-full justify-start gap-2',
+                      isActive && 'bg-accent'
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Button>
+                </Link>
+              );
+            })}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setMobileOpen(false);
+                handleLogout();
+              }}
+              className="text-muted-foreground w-full justify-start gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Exit Admin
+            </Button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

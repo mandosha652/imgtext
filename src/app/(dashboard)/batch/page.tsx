@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, Layers, AlertCircle } from 'lucide-react';
+import { Loader2, Layers, AlertCircle, Inbox } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -96,6 +97,17 @@ export default function BatchPage() {
     setWebhookUrl('');
   };
 
+  const isWebhookValid = webhookUrl.trim()
+    ? (() => {
+        try {
+          new URL(webhookUrl.trim());
+          return true;
+        } catch {
+          return false;
+        }
+      })()
+    : true;
+
   const handleStartBatch = async () => {
     if (files.length === 0) {
       toast.error('Please select at least one image');
@@ -111,6 +123,10 @@ export default function BatchPage() {
     }
     if (activeBatches.length >= MAX_CONCURRENT_BATCHES) {
       toast.error('Too many active batches — wait for one to finish');
+      return;
+    }
+    if (webhookUrl.trim() && !isWebhookValid) {
+      toast.error('Webhook URL must be a valid URL');
       return;
     }
     try {
@@ -235,12 +251,16 @@ export default function BatchPage() {
                   onChange={e => setWebhookUrl(e.target.value)}
                   disabled={createBatchMutation.isPending}
                 />
-                {webhookUrl.trim() && (
-                  <p className="text-muted-foreground text-xs">
-                    A POST request will be sent to this URL when the batch
-                    finishes
-                  </p>
-                )}
+                {webhookUrl.trim() &&
+                  (isWebhookValid ? (
+                    <p className="text-muted-foreground text-xs">
+                      POST will be sent when batch finishes
+                    </p>
+                  ) : (
+                    <p className="text-destructive text-xs">
+                      Enter a valid URL (e.g. https://…)
+                    </p>
+                  ))}
               </div>
 
               {atConcurrentLimit && (
@@ -260,7 +280,8 @@ export default function BatchPage() {
                   files.length === 0 ||
                   targetLanguages.length === 0 ||
                   createBatchMutation.isPending ||
-                  atConcurrentLimit
+                  atConcurrentLimit ||
+                  !isWebhookValid
                 }
                 className="w-full"
                 size="lg"
@@ -294,7 +315,13 @@ export default function BatchPage() {
               <Card key={batch.batch_id}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">Running</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <span className="relative flex h-2 w-2">
+                        <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+                        <span className="bg-primary relative inline-flex h-2 w-2 rounded-full" />
+                      </span>
+                      Running
+                    </CardTitle>
                     <p className="text-muted-foreground text-xs">
                       {format(new Date(batch.created_at), 'HH:mm')}
                     </p>
@@ -310,9 +337,12 @@ export default function BatchPage() {
               </Card>
             ))
           ) : (
-            <div className="flex h-full min-h-50 items-center justify-center rounded-xl border-2 border-dashed">
-              <p className="text-muted-foreground text-sm">No active batches</p>
-            </div>
+            <EmptyState
+              icon={Inbox}
+              title="No active batches"
+              description="Start a new batch on the left to see it here"
+              className="h-full min-h-50"
+            />
           )}
         </div>
       </div>

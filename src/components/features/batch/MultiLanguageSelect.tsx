@@ -53,7 +53,9 @@ export function MultiLanguageSelect({
               <button
                 onClick={() => removeLanguage(code)}
                 disabled={disabled}
-                className="hover:bg-muted-foreground/20 ml-1 rounded-full p-0.5"
+                aria-label={`Remove ${getLanguageName(code)}`}
+                title={`Remove ${getLanguageName(code)}`}
+                className="hover:bg-muted-foreground/20 ml-1 cursor-pointer rounded-full p-0.5"
               >
                 <X className="h-3 w-3" />
               </button>

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Layers, ArrowRight, Search, X, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,7 +30,9 @@ function CardSkeleton() {
 
 export default function HistoryPage() {
   const [page, setPage] = useState(1);
+  const [batchPage, setBatchPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('single');
 
   const {
     data: singleHistory,
@@ -74,6 +78,11 @@ export default function HistoryPage() {
   const totalSinglePages = singleHistory
     ? Math.ceil(singleHistory.total / ITEMS_PER_PAGE)
     : 1;
+  const totalBatchPages = Math.ceil(filteredBatches.length / ITEMS_PER_PAGE);
+  const paginatedBatches = filteredBatches.slice(
+    (batchPage - 1) * ITEMS_PER_PAGE,
+    batchPage * ITEMS_PER_PAGE
+  );
   const isLoading = isSingleLoading || isBatchesLoading;
 
   const isEmpty =
@@ -108,29 +117,34 @@ export default function HistoryPage() {
 
       {/* Empty */}
       {isEmpty && (
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20 text-center">
-          <Clock className="text-muted-foreground h-10 w-10" />
-          <p className="mt-4 font-medium">No translations yet</p>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Your history will appear here after your first translation
-          </p>
-          <div className="mt-6 flex gap-3">
-            <Link href="/translate">
-              <Button size="sm">
-                Single image <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-            <Link href="/batch">
-              <Button size="sm" variant="outline">
-                Batch <Layers className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          icon={Clock}
+          title="No translations yet"
+          description="Your history will appear here after your first translation"
+          size="lg"
+          actions={
+            <>
+              <Link href="/translate">
+                <Button size="sm">
+                  Single image <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </Link>
+              <Link href="/batch">
+                <Button size="sm" variant="outline">
+                  Batch <Layers className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </Link>
+            </>
+          }
+        />
       )}
 
       {!isEmpty && (
-        <Tabs defaultValue="single" className="space-y-5">
+        <Tabs
+          defaultValue="single"
+          className="space-y-5"
+          onValueChange={setActiveTab}
+        >
           {/* Tabs + search row */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <TabsList>
@@ -173,70 +187,113 @@ export default function HistoryPage() {
             </div>
           </div>
 
-          {/* ── Single tab ── */}
-          <TabsContent value="single" className="mt-0 space-y-3">
-            {isSingleLoading ? (
-              Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)
-            ) : filteredSingles.length === 0 ? (
-              <div className="text-muted-foreground rounded-xl border-2 border-dashed py-16 text-center text-sm">
-                {searchQuery
-                  ? 'No results match your search'
-                  : 'No single translations yet'}
-              </div>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  {filteredSingles.map(item => (
-                    <SingleCard key={item.id} item={item} />
-                  ))}
-                </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.15, ease: 'easeInOut' }}
+            >
+              {/* ── Single tab ── */}
+              <TabsContent value="single" className="mt-0 space-y-3">
+                {isSingleLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <CardSkeleton key={i} />
+                  ))
+                ) : filteredSingles.length === 0 ? (
+                  <EmptyState
+                    title={
+                      searchQuery
+                        ? 'No results match your search'
+                        : 'No single translations yet'
+                    }
+                  />
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      {filteredSingles.map(item => (
+                        <SingleCard key={item.id} item={item} />
+                      ))}
+                    </div>
 
-                {/* Pagination */}
-                {totalSinglePages > 1 && (
-                  <div className="flex items-center justify-center gap-3 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page <= 1}
-                      onClick={() => setPage(p => p - 1)}
-                    >
-                      Previous
-                    </Button>
-                    <span className="text-muted-foreground text-sm">
-                      {page} / {totalSinglePages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page >= totalSinglePages}
-                      onClick={() => setPage(p => p + 1)}
-                    >
-                      Next
-                    </Button>
-                  </div>
+                    {/* Pagination */}
+                    {totalSinglePages > 1 && (
+                      <div className="flex items-center justify-center gap-3 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={page <= 1}
+                          onClick={() => setPage(p => p - 1)}
+                        >
+                          Previous
+                        </Button>
+                        <span className="text-muted-foreground text-sm">
+                          {page} / {totalSinglePages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={page >= totalSinglePages}
+                          onClick={() => setPage(p => p + 1)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </TabsContent>
+              </TabsContent>
 
-          {/* ── Batch tab ── */}
-          <TabsContent value="batch" className="mt-0 space-y-3">
-            {isBatchesLoading ? (
-              Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} />)
-            ) : filteredBatches.length === 0 ? (
-              <div className="text-muted-foreground rounded-xl border-2 border-dashed py-16 text-center text-sm">
-                {searchQuery
-                  ? 'No results match your search'
-                  : 'No batch translations yet'}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {filteredBatches.map(batch => (
-                  <BatchCard key={batch.batch_id} batch={batch} />
-                ))}
-              </div>
-            )}
-          </TabsContent>
+              {/* ── Batch tab ── */}
+              <TabsContent value="batch" className="mt-0 space-y-3">
+                {isBatchesLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <CardSkeleton key={i} />
+                  ))
+                ) : filteredBatches.length === 0 ? (
+                  <EmptyState
+                    title={
+                      searchQuery
+                        ? 'No results match your search'
+                        : 'No batch translations yet'
+                    }
+                  />
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      {paginatedBatches.map(batch => (
+                        <BatchCard key={batch.batch_id} batch={batch} />
+                      ))}
+                    </div>
+                    {totalBatchPages > 1 && (
+                      <div className="flex items-center justify-center gap-3 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={batchPage <= 1}
+                          onClick={() => setBatchPage(p => p - 1)}
+                        >
+                          Previous
+                        </Button>
+                        <span className="text-muted-foreground text-sm">
+                          {batchPage} / {totalBatchPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={batchPage >= totalBatchPages}
+                          onClick={() => setBatchPage(p => p + 1)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </TabsContent>
+            </motion.div>
+          </AnimatePresence>
         </Tabs>
       )}
     </div>

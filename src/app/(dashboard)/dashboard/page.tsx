@@ -78,7 +78,7 @@ export default function DashboardPage() {
       <div
         className={`grid gap-6 ${isNewUser ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-4'}`}
       >
-        <Card>
+        <Card className="transition-shadow duration-200 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
@@ -97,7 +97,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="transition-shadow duration-200 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Layers className="h-5 w-5" />
@@ -121,7 +121,7 @@ export default function DashboardPage() {
         )}
 
         {!isNewUser && (isLoading || isError) && (
-          <Card>
+          <Card className="transition-shadow duration-200 hover:shadow-md">
             <CardHeader className="pb-2">
               <CardDescription>This Month</CardDescription>
               {isLoading ? (
@@ -139,7 +139,7 @@ export default function DashboardPage() {
         )}
 
         {!isNewUser && (
-          <Card>
+          <Card className="transition-shadow duration-200 hover:shadow-md">
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5 text-green-500" /> All Time
@@ -192,7 +192,7 @@ export default function DashboardPage() {
 
       {/* Last Active — only for returning users */}
       {!isNewUser && !isError && (
-        <Card>
+        <Card className="transition-shadow duration-200 hover:shadow-md">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" /> Last Active

@@ -48,13 +48,15 @@ export function SingleCard({ item }: SingleCardProps) {
             href={getImageUrl(item.translated_image_url)}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Open translated image"
             title="Open translated image"
             onClick={e => e.stopPropagation()}
-            className="text-muted-foreground hover:text-foreground rounded p-1.5 opacity-0 transition-colors group-hover:opacity-100"
+            className="focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground rounded p-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
           <button
+            aria-label="Download translated image"
             title="Download translated image"
             onClick={e => {
               e.stopPropagation();
@@ -63,7 +65,7 @@ export function SingleCard({ item }: SingleCardProps) {
                 `translated-${item.target_lang}.png`
               );
             }}
-            className="text-muted-foreground hover:text-foreground rounded p-1.5 opacity-0 transition-colors group-hover:opacity-100"
+            className="focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground cursor-pointer rounded p-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <Download className="h-3.5 w-3.5" />
           </button>

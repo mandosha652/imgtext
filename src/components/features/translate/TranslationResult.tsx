@@ -111,6 +111,7 @@ function ZoomableImage({ src, alt, priority }: ZoomableImageProps) {
             setScale(1);
             setOrigin({ x: 50, y: 50 });
           }}
+          aria-label="Reset zoom"
           className="absolute right-2 bottom-2 rounded bg-black/50 px-2 py-1 text-xs text-white backdrop-blur-sm"
         >
           Reset zoom
@@ -227,6 +228,11 @@ export function TranslationResult({ result }: TranslationResultProps) {
                   <Button
                     variant="outline"
                     size="sm"
+                    aria-label={
+                      copiedUrl === result.translated_image_url
+                        ? 'Copied'
+                        : 'Copy URL'
+                    }
                     onClick={() => copyUrl(result.translated_image_url)}
                   >
                     {copiedUrl === result.translated_image_url ? (
@@ -240,6 +246,7 @@ export function TranslationResult({ result }: TranslationResultProps) {
                       href={getImageUrl(result.translated_image_url)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label="Open in new tab"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>

@@ -39,6 +39,7 @@ export function NotificationBell() {
         <Button
           variant="ghost"
           size="icon"
+          aria-label="Notifications"
           title="Notifications"
           className="relative"
         >
@@ -88,7 +89,10 @@ export function NotificationBell() {
                 >
                   {n.message}
                 </p>
-                <p className="text-muted-foreground mt-0.5 text-xs">
+                <p
+                  className="text-muted-foreground mt-0.5 text-xs"
+                  suppressHydrationWarning
+                >
                   {formatDistanceToNowStrict(new Date(n.timestamp), {
                     addSuffix: true,
                   })}

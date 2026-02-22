@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useState } from 'react';
-import { Loader2, RotateCcw, X } from 'lucide-react';
+import { Loader2, RotateCcw, X, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,7 @@ import { ImageUploader } from '@/components/features/translate/ImageUploader';
 import { LanguageSelect } from '@/components/features/translate/LanguageSelect';
 import { TranslationResult } from '@/components/features/translate/TranslationResult';
 import { useTranslateImage } from '@/hooks';
+import { EmptyState } from '@/components/ui/empty-state';
 import type { TranslateResponse } from '@/types';
 import { historyStorage } from '@/lib/utils/historyStorage';
 import { getErrorMessage } from '@/lib/utils';
@@ -205,17 +206,11 @@ export default function TranslatePage() {
           )}
 
           {!result && !translateMutation.isPending && (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-muted-foreground font-medium">
-                  Your translated image will appear here
-                </p>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  You&apos;ll get the translated image, the original with text
-                  removed, and a region-by-region text breakdown
-                </p>
-              </CardContent>
-            </Card>
+            <EmptyState
+              icon={ImageIcon}
+              title="Your translated image will appear here"
+              description="You'll get the translated image, the original with text removed, and a region-by-region breakdown"
+            />
           )}
         </div>
       </div>

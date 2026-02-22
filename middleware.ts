@@ -40,7 +40,14 @@ export function middleware(request: NextRequest) {
   // Redirect unauthenticated users from protected routes to login
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
+    // Only allow relative paths to prevent open redirect attacks
+    const rawCallback =
+      request.nextUrl.searchParams.get('callbackUrl') ?? pathname;
+    const safeCallback =
+      rawCallback.startsWith('/') && !rawCallback.startsWith('//')
+        ? rawCallback
+        : '/dashboard';
+    loginUrl.searchParams.set('callbackUrl', safeCallback);
     return NextResponse.redirect(loginUrl);
   }
 

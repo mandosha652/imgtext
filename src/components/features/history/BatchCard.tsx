@@ -136,6 +136,7 @@ export function BatchCard({ batch }: BatchCardProps) {
                 handleDownloadAll();
               }}
               disabled={isZipping}
+              aria-label="Download all as ZIP"
               title="Download all as ZIP"
               className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded p-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
             >

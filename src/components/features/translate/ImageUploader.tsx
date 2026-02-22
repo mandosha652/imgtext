@@ -66,6 +66,7 @@ export function ImageUploader({
           onClick={clearFile}
           disabled={disabled}
           title="Remove image"
+          aria-label="Remove image"
         >
           <X className="h-4 w-4" />
         </Button>

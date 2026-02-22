@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import {
-  Languages,
-  ArrowLeft,
-  Mail,
-  BookOpen,
-  ChevronDown,
-} from 'lucide-react';
+import { Languages, ArrowLeft, Mail, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { FaqAccordion } from '@/components/features/help/FaqAccordion';
 
 export const metadata = {
   title: 'Help & FAQ — OCR Translate',
@@ -126,22 +121,7 @@ export default function HelpPage() {
             <h2 className="text-xl font-semibold">
               Frequently Asked Questions
             </h2>
-            <div className="space-y-3">
-              {faqs.map((faq, i) => (
-                <details
-                  key={i}
-                  className="group hover:border-border/80 rounded-lg border transition-colors"
-                >
-                  <summary className="focus-visible:ring-ring/50 flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 font-medium select-none marker:content-none focus-visible:ring-2 focus-visible:outline-none">
-                    {faq.q}
-                    <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180" />
-                  </summary>
-                  <div className="text-muted-foreground border-t px-4 py-3 text-sm leading-relaxed">
-                    {faq.a}
-                  </div>
-                </details>
-              ))}
-            </div>
+            <FaqAccordion faqs={faqs} />
           </section>
 
           {/* Contact */}
