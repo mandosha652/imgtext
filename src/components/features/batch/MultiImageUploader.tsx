@@ -49,11 +49,11 @@ export function MultiImageUploader({
     const loadPreviews = async () => {
       const newPreviews = new Map<string, string>();
       for (const file of selectedFiles) {
+        if (cancelled) break;
         const key = `${file.name}-${file.size}-${file.lastModified}`;
         const preview = await generatePreview(file);
-        if (!cancelled) {
-          newPreviews.set(key, preview);
-        }
+        if (cancelled) break;
+        newPreviews.set(key, preview);
       }
       if (!cancelled) {
         setPreviews(newPreviews);

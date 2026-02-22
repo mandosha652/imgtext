@@ -109,6 +109,10 @@ export default function BatchPage() {
       toast.error(`Maximum ${MAX_TARGET_LANGUAGES} target languages allowed`);
       return;
     }
+    if (activeBatches.length >= MAX_CONCURRENT_BATCHES) {
+      toast.error('Too many active batches — wait for one to finish');
+      return;
+    }
     try {
       const response = await createBatchMutation.mutateAsync({
         files,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import JSZip from 'jszip';
 import { format } from 'date-fns';
 import {
@@ -212,6 +212,13 @@ export function BatchResults({ batchStatus }: BatchResultsProps) {
   const [expanded, setExpanded] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
   const retryImage = useRetryBatchImage();
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const config = statusConfig[status];
   const StatusIcon = config.icon;
@@ -268,7 +275,7 @@ export function BatchResults({ batchStatus }: BatchResultsProps) {
     } catch {
       toast.error('Failed to create ZIP — try downloading individually');
     } finally {
-      setIsZipping(false);
+      if (mountedRef.current) setIsZipping(false);
     }
   };
 

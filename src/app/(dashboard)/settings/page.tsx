@@ -215,10 +215,14 @@ export default function SettingsPage() {
   };
 
   const handleCopyKey = async (key: string) => {
-    await navigator.clipboard.writeText(key);
-    setCopied(true);
-    toast.success('Copied to clipboard');
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(key);
+      setCopied(true);
+      toast.success('Copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy — please select and copy the key manually');
+    }
   };
 
   const handleRevokeKey = async (keyId: string) => {
