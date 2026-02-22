@@ -1,5 +1,15 @@
 'use client';
 
+// Ambient type for the non-standard PasswordCredential browser API
+declare global {
+  interface Window {
+    PasswordCredential?: new (data: {
+      id: string;
+      password: string;
+    }) => Credential;
+  }
+}
+
 import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -43,18 +53,10 @@ function LoginForm() {
       // Trigger browser password save detection
       if (
         typeof window !== 'undefined' &&
-        'PasswordCredential' in window &&
+        window.PasswordCredential &&
         navigator.credentials
       ) {
-        const PasswordCredentialConstructor = (
-          window as unknown as {
-            PasswordCredential: new (data: {
-              id: string;
-              password: string;
-            }) => Credential;
-          }
-        ).PasswordCredential;
-        const cred = new PasswordCredentialConstructor({
+        const cred = new window.PasswordCredential({
           id: data.email,
           password: data.password,
         });

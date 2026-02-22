@@ -213,7 +213,9 @@ export default function SettingsPage() {
         setCopied(true);
         toast.success('API key created and copied to clipboard');
       } catch {
-        toast.success('API key created — copy it before closing');
+        toast.warning(
+          'API key created — clipboard unavailable, copy it manually before closing'
+        );
       }
     } catch {
       toast.error('Failed to create API key');

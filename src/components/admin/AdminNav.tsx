@@ -34,6 +34,9 @@ export function AdminNav() {
 
   const handleLogout = () => {
     adminKeyStorage.clear();
+    // Clear the session cookie that middleware uses to guard /admin routes
+    document.cookie =
+      'admin_authenticated=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
     router.push('/dashboard');
   };
 

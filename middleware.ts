@@ -13,6 +13,9 @@ const protectedRoutes = [
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = ['/login', '/signup'];
 
+// Admin routes — require the admin_authenticated session cookie
+const adminRoutes = ['/admin'];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -37,6 +40,11 @@ export function middleware(request: NextRequest) {
     route => pathname === route || pathname.startsWith(`${route}/`)
   );
 
+  // Check if current route is an admin route
+  const isAdminRoute = adminRoutes.some(
+    route => pathname === route || pathname.startsWith(`${route}/`)
+  );
+
   // Redirect unauthenticated users from protected routes to login
   if (isProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
@@ -54,6 +62,19 @@ export function middleware(request: NextRequest) {
   // Redirect authenticated users from auth routes to dashboard
   if (isAuthRoute && isAuthenticated) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // Guard admin routes: require the session cookie set by AdminAuthGate
+  if (isAdminRoute) {
+    const adminAuthenticated = request.cookies.get(
+      'admin_authenticated'
+    )?.value;
+    if (!adminAuthenticated) {
+      // Redirect to admin root where AdminAuthGate will prompt for the key
+      if (pathname !== '/admin') {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
+    }
   }
 
   return NextResponse.next();

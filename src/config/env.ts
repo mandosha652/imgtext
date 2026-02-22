@@ -23,16 +23,16 @@ export const shouldBypassAuth = isDev && env.DEV_AUTH_BYPASS;
 
 if (typeof window !== 'undefined') {
   if (!isDev && !process.env.NEXT_PUBLIC_API_URL) {
-    console.warn(
-      '[config] NEXT_PUBLIC_API_URL is not set — falling back to http://localhost:8000. ' +
-        'Set this env var in production.'
+    throw new Error(
+      '[config] NEXT_PUBLIC_API_URL is not set. ' +
+        'This variable is required in production. Set it in your deployment environment.'
     );
   }
 
   if (!isDev && env.DEV_AUTH_BYPASS) {
-    console.error(
+    throw new Error(
       '[config] NEXT_PUBLIC_DEV_AUTH_BYPASS=true is set in a non-development environment. ' +
-        'This bypasses authentication and must not be enabled in production. ' +
+        'This bypasses all authentication and must never be enabled in production. ' +
         'Remove this env var immediately.'
     );
   }

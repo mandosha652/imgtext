@@ -83,6 +83,10 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor - handle token refresh
+// NOTE: These are intentionally module-level (not instance-level).
+// This file exports a single apiClient instance; the shared state is safe
+// because there is exactly one instance. Do not create additional
+// apiClient instances from this module.
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (token: string) => void;
