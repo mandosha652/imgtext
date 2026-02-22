@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks';
 import { registerSchema, type RegisterFormData } from '@/lib/validators';
 import { AxiosError } from 'axios';
@@ -42,6 +43,8 @@ function getPasswordStrength(password: string): {
 
 function SignupForm() {
   const { registerAsync, isRegistering } = useAuth();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState('');
@@ -58,11 +61,14 @@ function SignupForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const result = await registerAsync({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-      });
+      const result = await registerAsync(
+        {
+          email: data.email,
+          password: data.password,
+          name: data.name,
+        },
+        callbackUrl
+      );
       toast.success('Account created successfully!', {
         description: `Your API key: ${result.api_key.slice(0, 12)}... (Check your dashboard)`,
         duration: 10000,

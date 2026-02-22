@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { authApi, tokenStorage } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { shouldBypassAuth } from '@/config/env';
@@ -10,7 +10,6 @@ import type { LoginRequest, RegisterRequest } from '@/types';
 
 export function useAuth() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading, setUser, setLoading, logout } =
     useAuthStore();
@@ -42,28 +41,25 @@ export function useAuth() {
     retry: false,
   });
 
-  // Handle callback URL after login
-  const getCallbackUrl = useCallback(() => {
-    return searchParams.get('callbackUrl') || '/dashboard';
-  }, [searchParams]);
-
   // Login mutation
   const loginMutation = useMutation({
-    mutationFn: (data: LoginRequest) => authApi.login(data),
-    onSuccess: data => {
+    mutationFn: ({ data }: { data: LoginRequest; callbackUrl?: string }) =>
+      authApi.login(data),
+    onSuccess: (data, { callbackUrl }) => {
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.push(getCallbackUrl());
+      router.push(callbackUrl || '/dashboard');
     },
   });
 
   // Register mutation
   const registerMutation = useMutation({
-    mutationFn: (data: RegisterRequest) => authApi.register(data),
-    onSuccess: data => {
+    mutationFn: ({ data }: { data: RegisterRequest; callbackUrl?: string }) =>
+      authApi.register(data),
+    onSuccess: (data, { callbackUrl }) => {
       setUser(data.user);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.push(getCallbackUrl());
+      router.push(callbackUrl || '/dashboard');
     },
   });
 
@@ -82,16 +78,40 @@ export function useAuth() {
     }
   }, [setLoading]);
 
+  const login = useCallback(
+    (data: LoginRequest, callbackUrl?: string) =>
+      loginMutation.mutate({ data, callbackUrl }),
+    [loginMutation]
+  );
+
+  const loginAsync = useCallback(
+    (data: LoginRequest, callbackUrl?: string) =>
+      loginMutation.mutateAsync({ data, callbackUrl }),
+    [loginMutation]
+  );
+
+  const register = useCallback(
+    (data: RegisterRequest, callbackUrl?: string) =>
+      registerMutation.mutate({ data, callbackUrl }),
+    [registerMutation]
+  );
+
+  const registerAsync = useCallback(
+    (data: RegisterRequest, callbackUrl?: string) =>
+      registerMutation.mutateAsync({ data, callbackUrl }),
+    [registerMutation]
+  );
+
   return {
     user,
     isAuthenticated,
     isLoading,
-    login: loginMutation.mutate,
-    loginAsync: loginMutation.mutateAsync,
+    login,
+    loginAsync,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
-    register: registerMutation.mutate,
-    registerAsync: registerMutation.mutateAsync,
+    register,
+    registerAsync,
     isRegistering: registerMutation.isPending,
     registerError: registerMutation.error,
     logout: handleLogout,

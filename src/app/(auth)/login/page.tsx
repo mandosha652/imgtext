@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,8 @@ import { AxiosError } from 'axios';
 
 function LoginForm() {
   const { loginAsync, isLoggingIn } = useAuth();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -35,7 +38,7 @@ function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await loginAsync(data);
+      await loginAsync(data, callbackUrl);
       toast.success('Welcome back!');
       // Trigger browser password save detection
       if (
