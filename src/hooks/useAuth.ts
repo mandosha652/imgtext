@@ -68,8 +68,8 @@ export function useAuth() {
   });
 
   // Logout handler
-  const handleLogout = useCallback(() => {
-    authApi.logout();
+  const handleLogout = useCallback(async () => {
+    await authApi.logout();
     logout();
     queryClient.clear();
     router.push('/login');

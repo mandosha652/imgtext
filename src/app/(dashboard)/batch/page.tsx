@@ -28,6 +28,7 @@ export default function BatchPage() {
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [sourceLang, setSourceLang] = useState('auto');
   const [excludeText, setExcludeText] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState('');
 
   const createBatchMutation = useCreateBatch();
   const cancelBatchMutation = useCancelBatch();
@@ -92,6 +93,7 @@ export default function BatchPage() {
     setTargetLanguages([]);
     setSourceLang('auto');
     setExcludeText('');
+    setWebhookUrl('');
   };
 
   const handleStartBatch = async () => {
@@ -114,6 +116,7 @@ export default function BatchPage() {
         options: {
           sourceLanguage: sourceLang !== 'auto' ? sourceLang : undefined,
           excludeText: excludeText || undefined,
+          webhookUrl: webhookUrl.trim() || undefined,
         },
       });
       toast.success(`Batch started with ${response.total_images} images`);
@@ -211,6 +214,29 @@ export default function BatchPage() {
                       excluded
                     </p>
                   ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="webhookUrl">
+                  Webhook URL{' '}
+                  <span className="text-muted-foreground font-normal">
+                    (optional)
+                  </span>
+                </Label>
+                <Input
+                  id="webhookUrl"
+                  type="url"
+                  placeholder="https://your-server.com/webhook"
+                  value={webhookUrl}
+                  onChange={e => setWebhookUrl(e.target.value)}
+                  disabled={createBatchMutation.isPending}
+                />
+                {webhookUrl.trim() && (
+                  <p className="text-muted-foreground text-xs">
+                    A POST request will be sent to this URL when the batch
+                    finishes
+                  </p>
+                )}
               </div>
 
               {atConcurrentLimit && (

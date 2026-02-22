@@ -100,6 +100,11 @@ const processQueue = (error: AxiosError | null, token: string | null) => {
   failedQueue = [];
 };
 
+export const resetAuthState = () => {
+  isRefreshing = false;
+  failedQueue = [];
+};
+
 apiClient.interceptors.response.use(
   response => response,
   async (error: AxiosError) => {

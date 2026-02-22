@@ -1,4 +1,4 @@
-import apiClient, { tokenStorage } from './client';
+import apiClient, { tokenStorage, resetAuthState } from './client';
 import { ENDPOINTS } from '@/lib/constants';
 import type {
   LoginRequest,
@@ -47,10 +47,17 @@ export const authApi = {
   },
 
   /**
-   * Logout - clear tokens
+   * Logout - revoke token server-side then clear locally
    */
-  logout: (): void => {
-    tokenStorage.clearTokens();
+  logout: async (): Promise<void> => {
+    resetAuthState();
+    try {
+      await apiClient.post(ENDPOINTS.LOGOUT);
+    } catch {
+      // Best-effort revocation — always clear tokens locally
+    } finally {
+      tokenStorage.clearTokens();
+    }
   },
 
   /**

@@ -56,6 +56,16 @@ export function DashboardNav() {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   const initials = user?.name
     ? user.name
@@ -256,9 +266,18 @@ export function DashboardNav() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={logout}>
-              Log out
+            <AlertDialogCancel disabled={isLoggingOut}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isLoggingOut}
+              onClick={e => {
+                e.preventDefault();
+                handleLogoutConfirm();
+              }}
+            >
+              {isLoggingOut ? 'Logging out…' : 'Log out'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
