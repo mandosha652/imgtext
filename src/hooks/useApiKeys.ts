@@ -7,6 +7,7 @@ import type {
   ApiKeyCreateRequest,
   ApiKeyRenameRequest,
   UpdateProfileRequest,
+  ChangePasswordRequest,
 } from '@/types';
 
 export function useApiKeys() {
@@ -75,5 +76,11 @@ export function useUpdateProfile() {
       setUser(updatedUser);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (data: ChangePasswordRequest) => authApi.changePassword(data),
   });
 }

@@ -12,6 +12,7 @@ import {
   RefreshCw,
   Pencil,
   X,
+  Lock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -45,6 +46,7 @@ import {
   useRenameApiKey,
   useApiKeyStats,
   useUpdateProfile,
+  useChangePassword,
 } from '@/hooks';
 import { authApi, tokenStorage } from '@/lib/api';
 import {
@@ -53,6 +55,7 @@ import {
   isTomorrow,
   differenceInDays,
   format,
+  formatDistanceToNow,
 } from 'date-fns';
 
 function formatLastUsed(iso: string | null): string {
@@ -139,6 +142,41 @@ export default function SettingsPage() {
   const renameApiKey = useRenameApiKey();
 
   const updateProfile = useUpdateProfile();
+  const changePassword = useChangePassword();
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast.error('New password must be at least 8 characters');
+      return;
+    }
+    try {
+      await changePassword.mutateAsync({
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      toast.success('Password changed — please log in again');
+      tokenStorage.clearTokens();
+      queryClient.clear();
+      logout();
+      router.push('/login');
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      if (status === 400) {
+        toast.error('Current password is incorrect');
+      } else {
+        toast.error('Failed to change password');
+      }
+    }
+  };
 
   const [newKeyName, setNewKeyName] = useState('');
   const [newKeyExpiryDays, setNewKeyExpiryDays] = useState('');
@@ -317,6 +355,7 @@ export default function SettingsPage() {
           <ul className="sticky top-24 space-y-1 text-sm">
             {[
               { label: 'Account', href: '#account' },
+              { label: 'Password', href: '#password' },
               { label: 'API Keys', href: '#api-keys' },
               { label: 'Danger Zone', href: '#danger-zone' },
             ].map(item => (
@@ -427,8 +466,92 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
+                  {user?.created_at && (
+                    <div className="space-y-2">
+                      <Label>Member Since</Label>
+                      <p className="text-sm">
+                        {format(new Date(user.created_at), 'MMMM d, yyyy')}
+                        <span className="text-muted-foreground ml-2 text-xs">
+                          (
+                          {formatDistanceToNow(new Date(user.created_at), {
+                            addSuffix: true,
+                          })}
+                          )
+                        </span>
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Change Password */}
+          <Card id="password">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Lock className="text-muted-foreground h-4 w-4" />
+                <div>
+                  <CardTitle>Change Password</CardTitle>
+                  <CardDescription>
+                    Update your password. You will be signed out immediately.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="max-w-sm space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current password</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    value={currentPassword}
+                    onChange={e => setCurrentPassword(e.target.value)}
+                    disabled={changePassword.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New password</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    disabled={changePassword.isPending}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm new password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    disabled={changePassword.isPending}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') handleChangePassword();
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={
+                    changePassword.isPending ||
+                    !currentPassword ||
+                    !newPassword ||
+                    !confirmPassword
+                  }
+                >
+                  {changePassword.isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Update password
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

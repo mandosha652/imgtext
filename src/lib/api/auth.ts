@@ -19,6 +19,7 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   UpdateProfileRequest,
+  ChangePasswordRequest,
   UsageStatsResponse,
 } from '@/types';
 
@@ -202,6 +203,19 @@ export const authApi = {
   getUsageStats: async (): Promise<UsageStatsResponse> => {
     const response = await apiClient.get<UsageStatsResponse>(
       ENDPOINTS.USAGE_STATS
+    );
+    return response.data;
+  },
+
+  /**
+   * Change the current user's password. Server revokes JWT on success.
+   */
+  changePassword: async (
+    data: ChangePasswordRequest
+  ): Promise<MessageResponse> => {
+    const response = await apiClient.post<MessageResponse>(
+      ENDPOINTS.CHANGE_PASSWORD,
+      data
     );
     return response.data;
   },

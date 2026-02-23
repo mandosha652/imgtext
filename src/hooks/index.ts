@@ -17,6 +17,7 @@ export {
   useRenameApiKey,
   useApiKeyStats,
   useUpdateProfile,
+  useChangePassword,
 } from './useApiKeys';
 export { useUsageStats } from './useUsageStats';
 export {

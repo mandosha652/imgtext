@@ -65,6 +65,11 @@ export interface UpdateProfileRequest {
   email?: string;
 }
 
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
 // =============================================================================
 // API Key Types
 // =============================================================================
@@ -207,6 +212,7 @@ export interface BatchStatusResponse {
   completed_count: number;
   failed_count: number;
   pending_count: number;
+  is_expired: boolean;
   created_at: string;
   updated_at: string;
   images: ImageResult[];
@@ -226,6 +232,7 @@ export interface SingleTranslationRecord {
   source_lang: string | null;
   target_lang: string;
   processing_time_ms: number;
+  is_expired: boolean;
   created_at: string;
 }
 
@@ -247,10 +254,21 @@ export interface UsagePeriod {
   batches_run: number;
 }
 
+export interface UsageQuota {
+  tier: string;
+  images_limit: number | null;
+  translations_limit: number | null;
+  batches_limit: number | null;
+  images_used: number;
+  translations_used: number;
+  batches_used: number;
+}
+
 export interface UsageStatsResponse {
   current_month: UsagePeriod;
   last_month: UsagePeriod;
   all_time: UsagePeriod;
+  quota: UsageQuota;
   most_used_languages: string[];
   last_activity: string | null;
 }
@@ -352,6 +370,49 @@ export interface AdminPaginatedResponse<T> {
   limit: number;
   offset: number;
   items: T[];
+}
+
+export interface AdminVisionCostDetail {
+  calls: number;
+  cost_usd: number;
+}
+
+export interface AdminOpenAICostDetail {
+  cost_usd: number | null;
+  error?: string;
+}
+
+export interface AdminReplicateCostDetail {
+  cost_usd: number | null;
+  predictions: number;
+  total_seconds?: number;
+  error?: string;
+}
+
+export interface AdminCostSummary {
+  period_start: string;
+  period_end: string;
+  total_cost_usd: number;
+  vision: AdminVisionCostDetail;
+  openai: AdminOpenAICostDetail;
+  replicate: AdminReplicateCostDetail;
+}
+
+export interface AdminDailyCostEntry {
+  date: string;
+  vision_cost_usd: number;
+  openai_cost_usd: number | null;
+  replicate_cost_usd: number | null;
+  total_cost_usd: number;
+}
+
+export interface AdminUserCostRow {
+  user_id: string;
+  images_processed: number;
+  ocr_calls: number;
+  translate_calls: number;
+  inpaint_calls: number;
+  vision_cost_usd: number;
 }
 
 // =============================================================================

@@ -19,7 +19,8 @@ export const ENDPOINTS = {
   RESET_PASSWORD: '/api/v1/auth/reset-password',
 
   // Usage & account
-  USAGE_STATS: '/api/v1/me/usage',
+  USAGE_STATS: '/api/v1/usage/me/usage',
+  CHANGE_PASSWORD: '/api/v1/auth/change-password',
   DELETE_ACCOUNT: '/api/v1/auth/me',
 
   // Translation
@@ -42,6 +43,11 @@ export const ENDPOINTS = {
     `/api/v1/admin/users/${userId}/impersonate`,
   ADMIN_BATCHES: '/api/v1/admin/batches',
   ADMIN_BATCH: (batchId: string) => `/api/v1/admin/batches/${batchId}`,
+
+  // Admin — Costs
+  ADMIN_COSTS_SUMMARY: '/api/v1/admin/costs/summary',
+  ADMIN_COSTS_DAILY: '/api/v1/admin/costs/daily',
+  ADMIN_COSTS_BY_USER: '/api/v1/admin/costs/by-user',
 } as const;
 
 export const MAX_FILE_SIZE_MB = 10;
