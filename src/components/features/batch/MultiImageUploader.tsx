@@ -1,9 +1,15 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import {
+  Upload,
+  X,
+  Image as ImageIcon,
+  AlertCircle,
+  Camera,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,6 +36,7 @@ export function MultiImageUploader({
   selectedFiles,
   disabled,
 }: MultiImageUploaderProps) {
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<Map<string, string>>(new Map());
   const [previewImage, setPreviewImage] = useState<{
     file: File;
@@ -148,6 +155,31 @@ export function MultiImageUploader({
           </p>
         </div>
       </div>
+
+      {/* Camera capture — shown only on touch devices via CSS */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="environment"
+        className="hidden"
+        onChange={e => {
+          const file = e.target.files?.[0];
+          if (file) onDrop([file]);
+          e.target.value = '';
+        }}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="flex w-full items-center gap-2 sm:hidden"
+        disabled={disabled || selectedFiles.length >= MAX_BATCH_SIZE}
+        onClick={() => cameraInputRef.current?.click()}
+      >
+        <Camera className="h-4 w-4" />
+        Take a Photo
+      </Button>
 
       {fileRejections.length > 0 && (
         <div className="bg-destructive/10 text-destructive rounded-lg p-3 text-sm">

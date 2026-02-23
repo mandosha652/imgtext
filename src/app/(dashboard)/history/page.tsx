@@ -2,7 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Layers, ArrowRight, Search, X, XCircle } from 'lucide-react';
+import {
+  Clock,
+  Layers,
+  ArrowRight,
+  Search,
+  X,
+  XCircle,
+  Download,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -85,6 +93,25 @@ export default function HistoryPage() {
   );
   const isLoading = isSingleLoading || isBatchesLoading;
 
+  const handleExportJSON = () => {
+    const payload = {
+      exported_at: new Date().toISOString(),
+      single_translations: singleHistory?.items ?? [],
+      batches: finishedBatches,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `translation-history-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const isEmpty =
     !isLoading &&
     !isSingleError &&
@@ -94,11 +121,19 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">History</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          All your past translations
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">History</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            All your past translations
+          </p>
+        </div>
+        {!isEmpty && !isLoading && (
+          <Button variant="outline" size="sm" onClick={handleExportJSON}>
+            <Download className="mr-2 h-3.5 w-3.5" />
+            Export JSON
+          </Button>
+        )}
       </div>
 
       {/* Error */}
