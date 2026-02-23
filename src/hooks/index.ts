@@ -30,4 +30,7 @@ export {
   useAdminBatches,
   useAdminBatch,
   useAdminDeleteBatch,
+  useAdminCostSummary,
+  useAdminCostByUser,
+  useAdminCostDaily,
 } from './useAdmin';

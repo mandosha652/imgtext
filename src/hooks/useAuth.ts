@@ -33,6 +33,7 @@ export function useAuth() {
       } catch {
         tokenStorage.clearTokens();
         setUser(null);
+        router.push('/login');
         return null;
       }
     },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { AdminAuthGate } from '@/components/admin/AdminAuthGate';
 import { adminKeyStorage } from '@/lib/api/admin';
@@ -10,9 +10,11 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [hasKey, setHasKey] = useState<boolean | null>(() =>
-    typeof window !== 'undefined' ? adminKeyStorage.has() : null
-  );
+  const [hasKey, setHasKey] = useState<boolean | null>(null);
+
+  useLayoutEffect(() => {
+    setHasKey(adminKeyStorage.has());
+  }, []);
 
   // Avoid flash — wait for client-side check
   if (hasKey === null) return null;

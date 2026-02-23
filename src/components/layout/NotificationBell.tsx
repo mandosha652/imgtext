@@ -2,6 +2,7 @@
 
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import {
   DropdownMenu,
@@ -24,9 +25,14 @@ const TYPE_COLORS = {
 export function NotificationBell() {
   const router = useRouter();
   const { notifications, markAllRead, markRead } = useNotificationStore();
+  const [mounted, setMounted] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const recent = notifications.slice(0, 5);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const unreadCount = mounted ? notifications.filter(n => !n.read).length : 0;
+  const recent = mounted ? notifications.slice(0, 5) : [];
 
   function handleClick(id: string, href: string) {
     markRead(id);
