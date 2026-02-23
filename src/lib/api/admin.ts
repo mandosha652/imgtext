@@ -9,6 +9,9 @@ import type {
   AdminBatchSummary,
   AdminBatchDetail,
   AdminPaginatedResponse,
+  AdminCostSummary,
+  AdminDailyCostEntry,
+  AdminUserCostRow,
 } from '@/types';
 
 const ADMIN_KEY_STORAGE = 'admin_secret_key';
@@ -134,5 +137,33 @@ export const adminApi = {
 
   deleteBatch: async (batchId: string): Promise<void> => {
     await adminClient.delete(ENDPOINTS.ADMIN_BATCH(batchId));
+  },
+
+  getCostSummary: async (
+    period: 'today' | 'week' | 'month' | 'alltime' = 'month'
+  ): Promise<AdminCostSummary> => {
+    const res = await adminClient.get<AdminCostSummary>(
+      ENDPOINTS.ADMIN_COSTS_SUMMARY,
+      { params: { period } }
+    );
+    return res.data;
+  },
+
+  getCostDaily: async (days: number = 30): Promise<AdminDailyCostEntry[]> => {
+    const res = await adminClient.get<AdminDailyCostEntry[]>(
+      ENDPOINTS.ADMIN_COSTS_DAILY,
+      { params: { days } }
+    );
+    return res.data;
+  },
+
+  getCostByUser: async (
+    period: 'today' | 'week' | 'month' | 'alltime' = 'month'
+  ): Promise<AdminUserCostRow[]> => {
+    const res = await adminClient.get<AdminUserCostRow[]>(
+      ENDPOINTS.ADMIN_COSTS_BY_USER,
+      { params: { period } }
+    );
+    return res.data;
   },
 };

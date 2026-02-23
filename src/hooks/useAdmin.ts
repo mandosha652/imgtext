@@ -88,3 +88,34 @@ export function useAdminDeleteBatch() {
     },
   });
 }
+
+export function useAdminCostSummary(
+  period: 'today' | 'week' | 'month' | 'alltime' = 'month'
+) {
+  return useQuery({
+    queryKey: ['admin', 'costs', 'summary', period],
+    queryFn: () => adminApi.getCostSummary(period),
+    enabled: adminKeyStorage.has(),
+    staleTime: 5 * 60 * 1000, // 5 min — external API calls, don't hammer
+  });
+}
+
+export function useAdminCostDaily(days: number = 30) {
+  return useQuery({
+    queryKey: ['admin', 'costs', 'daily', days],
+    queryFn: () => adminApi.getCostDaily(days),
+    enabled: adminKeyStorage.has(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useAdminCostByUser(
+  period: 'today' | 'week' | 'month' | 'alltime' = 'month'
+) {
+  return useQuery({
+    queryKey: ['admin', 'costs', 'by-user', period],
+    queryFn: () => adminApi.getCostByUser(period),
+    enabled: adminKeyStorage.has(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
