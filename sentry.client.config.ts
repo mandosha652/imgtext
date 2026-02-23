@@ -13,6 +13,7 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
 
   integrations: [
+    Sentry.browserTracingIntegration(),
     Sentry.replayIntegration({
       maskAllText: true,
       blockAllMedia: true,
