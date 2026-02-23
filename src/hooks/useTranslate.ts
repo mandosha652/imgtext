@@ -148,13 +148,10 @@ export function useListBatches(options?: { enabled?: boolean }) {
     queryKey: ['batches'],
     queryFn: () => translateApi.listBatches(),
     enabled: options?.enabled ?? false,
-    refetchInterval: query => {
-      const data = query.state.data;
-      const hasActiveBatches = data?.some(
-        b => b.status === 'pending' || b.status === 'processing'
-      );
-      return hasActiveBatches ? BATCH_LIST_POLL_INTERVAL : false;
-    },
+    // SSE streams handle live progress — only poll to discover new/cancelled
+    // batches that might not be visible yet, at a slower cadence.
+    refetchInterval: BATCH_LIST_POLL_INTERVAL,
+    refetchIntervalInBackground: false,
   });
 }
 

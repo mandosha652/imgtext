@@ -1,4 +1,6 @@
 export { useAuth } from './useAuth';
+export { useBatchStream } from './useBatchStream';
+export type { BatchProgressEvent } from './useBatchStream';
 export {
   useTranslateImage,
   useCreateBatch,
