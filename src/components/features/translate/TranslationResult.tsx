@@ -201,7 +201,10 @@ export function TranslationResult({ result }: TranslationResultProps) {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="translated">Translated</TabsTrigger>
               <TabsTrigger value="original">Original</TabsTrigger>
-              <TabsTrigger value="clean">Text Removed</TabsTrigger>
+              <TabsTrigger value="clean">
+                <span className="sm:hidden">Cleaned</span>
+                <span className="hidden sm:inline">Text Removed</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="translated" className="mt-4">

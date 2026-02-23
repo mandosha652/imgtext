@@ -269,7 +269,7 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link href="/settings">
               <Button variant="outline">Manage Account</Button>
             </Link>

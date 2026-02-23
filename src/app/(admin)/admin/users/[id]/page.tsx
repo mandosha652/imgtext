@@ -246,19 +246,19 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/admin/users">
+      <div className="flex flex-wrap items-start gap-3">
+        <Link href="/admin/users" className="shrink-0">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold">{user.email}</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-2xl font-bold">{user.email}</h1>
           {user.name && (
             <p className="text-muted-foreground text-sm">{user.name}</p>
           )}
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className={TIER_COLORS[user.tier] ?? ''}>
             {user.tier}
           </Badge>
@@ -296,9 +296,9 @@ export default function AdminUserDetailPage() {
             <CardTitle className="text-base">Account Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">User ID</span>
-              <span className="font-mono text-xs">{user.id}</span>
+            <div className="flex flex-wrap justify-between gap-1">
+              <span className="text-muted-foreground shrink-0">User ID</span>
+              <span className="font-mono text-xs break-all">{user.id}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Joined</span>

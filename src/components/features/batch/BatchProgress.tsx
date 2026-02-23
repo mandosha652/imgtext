@@ -108,11 +108,11 @@ export function BatchProgress({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex items-center gap-3">
           <StatusIcon
             className={cn(
-              'h-5 w-5',
+              'h-5 w-5 shrink-0',
               status === 'processing' && 'text-primary animate-spin',
               status === 'pending' && 'text-muted-foreground',
               status === 'completed' && 'text-green-500',
@@ -130,13 +130,13 @@ export function BatchProgress({
             </p>
           </div>
         </div>
-        <Badge variant={config.variant} className="gap-1.5">
+        <Badge variant={config.variant} className="shrink-0 gap-1.5">
           {config.label}
         </Badge>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-1 text-sm">
           <span className="text-muted-foreground font-medium">
             {completed_count} completed · {failed_count} failed ·{' '}
             {total_images - completed_count - failed_count} remaining

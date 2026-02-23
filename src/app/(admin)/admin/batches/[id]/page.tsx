@@ -152,9 +152,11 @@ export default function AdminBatchDetailPage() {
           <CardTitle className="text-base">Batch Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Tenant ID</span>
-            <span className="font-mono text-xs">{batch.tenant_id}</span>
+          <div className="flex flex-wrap justify-between gap-1">
+            <span className="text-muted-foreground shrink-0">Tenant ID</span>
+            <span className="font-mono text-xs break-all">
+              {batch.tenant_id}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Source Language</span>

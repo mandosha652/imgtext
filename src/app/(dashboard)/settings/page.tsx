@@ -313,7 +313,7 @@ export default function SettingsPage() {
       </div>
       <div className="flex gap-8">
         {/* Left sub-nav */}
-        <nav className="hidden w-44 shrink-0 lg:block">
+        <nav className="hidden w-44 shrink-0 md:block">
           <ul className="sticky top-24 space-y-1 text-sm">
             {[
               { label: 'Account', href: '#account' },
@@ -578,7 +578,7 @@ export default function SettingsPage() {
                   {apiKeys.map(key => (
                     <div
                       key={key.id}
-                      className="group hover:bg-muted/30 flex items-center justify-between rounded-lg border p-4 transition-colors"
+                      className="group hover:bg-muted/30 flex flex-col gap-3 rounded-lg border p-4 transition-colors sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="flex items-center gap-4">
                         <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
@@ -756,7 +756,7 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="font-medium">Delete Account</p>
                   <p className="text-muted-foreground text-sm">

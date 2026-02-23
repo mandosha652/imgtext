@@ -338,12 +338,12 @@ export function BatchResults({ batchStatus }: BatchResultsProps) {
                 </span>
               )}
             </div>
-            <div className="mt-0.5 flex items-center gap-2">
-              <span className="text-muted-foreground text-xs">
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className="text-muted-foreground shrink-0 text-xs">
                 {formattedDate}
               </span>
-              <span className="text-muted-foreground text-xs">·</span>
-              <span className="text-muted-foreground text-xs">
+              <span className="text-muted-foreground shrink-0 text-xs">·</span>
+              <span className="text-muted-foreground min-w-0 truncate text-xs">
                 {target_languages.map(getLanguageName).join(', ')}
               </span>
             </div>

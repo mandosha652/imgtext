@@ -121,36 +121,67 @@ export default function PricingPage() {
             <h2 className="font-semibold">What&apos;s included</h2>
           </div>
 
-          {/* Table header */}
-          <div className="grid grid-cols-4 border-b px-6 py-3">
-            <div className="text-muted-foreground text-sm font-medium">
-              Feature
+          {/* Desktop table (md+) */}
+          <div className="hidden md:block">
+            {/* Table header */}
+            <div className="grid grid-cols-4 border-b px-6 py-3">
+              <div className="text-muted-foreground text-sm font-medium">
+                Feature
+              </div>
+              {TIERS.map(tier => (
+                <div
+                  key={tier.id}
+                  className="text-center text-sm font-semibold"
+                >
+                  {tier.name}
+                </div>
+              ))}
             </div>
-            {TIERS.map(tier => (
-              <div key={tier.id} className="text-center text-sm font-semibold">
-                {tier.name}
+
+            {/* Rows */}
+            {FEATURES.map((feature, i) => (
+              <div
+                key={feature.label}
+                className={`grid grid-cols-4 px-6 py-4 ${i < FEATURES.length - 1 ? 'border-b' : ''}`}
+              >
+                <div className="text-sm">{feature.label}</div>
+                <div className="text-center">
+                  <FeatureValue value={feature.free} />
+                </div>
+                <div className="text-center">
+                  <FeatureValue value={feature.pro} />
+                </div>
+                <div className="text-center">
+                  <FeatureValue value={feature.enterprise} />
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Rows */}
-          {FEATURES.map((feature, i) => (
-            <div
-              key={feature.label}
-              className={`grid grid-cols-4 px-6 py-4 ${i < FEATURES.length - 1 ? 'border-b' : ''}`}
-            >
-              <div className="text-sm">{feature.label}</div>
-              <div className="text-center">
-                <FeatureValue value={feature.free} />
+          {/* Mobile stacked cards (below md) */}
+          <div className="divide-y md:hidden">
+            {FEATURES.map(feature => (
+              <div key={feature.label} className="px-4 py-4">
+                <p className="mb-3 text-sm font-medium">{feature.label}</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {TIERS.map(tier => (
+                    <div key={tier.id} className="text-center">
+                      <p className="text-muted-foreground mb-1 text-xs font-medium">
+                        {tier.name}
+                      </p>
+                      <FeatureValue
+                        value={
+                          feature[tier.id as keyof typeof feature] as
+                            | string
+                            | boolean
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="text-center">
-                <FeatureValue value={feature.pro} />
-              </div>
-              <div className="text-center">
-                <FeatureValue value={feature.enterprise} />
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <p className="text-muted-foreground mt-12 text-center text-sm">
