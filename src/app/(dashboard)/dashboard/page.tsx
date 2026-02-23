@@ -117,7 +117,7 @@ export default function DashboardPage() {
         </Card>
 
         {!isNewUser && !isLoading && !isError && usage && (
-          <UsageChart usage={usage} tier={user?.tier ?? 'free'} />
+          <UsageChart usage={usage} />
         )}
 
         {!isNewUser && (isLoading || isError) && (
