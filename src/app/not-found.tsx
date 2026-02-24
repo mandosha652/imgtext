@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
       <div className="flex items-center gap-2">
         <Languages className="h-6 w-6" />
-        <span className="text-xl font-semibold">OCR Translate</span>
+        <span className="text-xl font-semibold">ImgText</span>
       </div>
       <div className="space-y-2">
         <h1 className="text-6xl font-bold tracking-tight">404</h1>

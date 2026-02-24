@@ -3,8 +3,12 @@ import { Languages, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Terms of Service — OCR Translate',
-  description: 'Terms of Service for OCR Translate.',
+  title: 'Terms of Service',
+  description:
+    'Read the Terms of Service for ImgText — acceptable use, account responsibilities, uploaded content, and liability.',
+  alternates: {
+    canonical: '/terms',
+  },
 };
 
 export default function TermsPage() {
@@ -14,7 +18,7 @@ export default function TermsPage() {
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold">ImgText</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
@@ -36,8 +40,8 @@ export default function TermsPage() {
             <section className="space-y-3">
               <h2 className="text-xl font-semibold">1. Acceptance of Terms</h2>
               <p className="text-muted-foreground">
-                By accessing or using OCR Translate (&quot;the Service&quot;),
-                you agree to be bound by these Terms of Service. If you do not
+                By accessing or using ImgText (&quot;the Service&quot;), you
+                agree to be bound by these Terms of Service. If you do not
                 agree, do not use the Service.
               </p>
             </section>
@@ -114,10 +118,10 @@ export default function TermsPage() {
                 7. Limitation of Liability
               </h2>
               <p className="text-muted-foreground">
-                To the maximum extent permitted by law, OCR Translate shall not
-                be liable for any indirect, incidental, special, or
-                consequential damages arising from your use of or inability to
-                use the Service.
+                To the maximum extent permitted by law, ImgText shall not be
+                liable for any indirect, incidental, special, or consequential
+                damages arising from your use of or inability to use the
+                Service.
               </p>
             </section>
 
@@ -152,7 +156,7 @@ export default function TermsPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex gap-4 text-sm">
               <Link href="/terms" className="hover:underline">

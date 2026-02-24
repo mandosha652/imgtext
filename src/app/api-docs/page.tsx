@@ -11,8 +11,18 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 export const metadata = {
-  title: 'API Reference — OCR Translate',
-  description: 'Documentation for the OCR Translate REST API.',
+  title: 'API Reference',
+  description:
+    'REST API documentation for ImgText. Translate images programmatically, manage batch jobs, and integrate webhooks.',
+  openGraph: {
+    title: 'API Reference | ImgText',
+    description:
+      'REST API documentation for ImgText. Translate images programmatically, manage batch jobs, and integrate webhooks.',
+    url: '/api-docs',
+  },
+  alternates: {
+    canonical: '/api-docs',
+  },
 };
 
 function CodeBlock({ children }: { children: string }) {
@@ -45,7 +55,7 @@ export default function ApiDocsPage() {
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold">ImgText</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
@@ -64,7 +74,7 @@ export default function ApiDocsPage() {
               <h1 className="text-3xl font-bold">API Reference</h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Integrate OCR Translate into your pipeline using the REST API.
+              Integrate ImgText into your pipeline using the REST API.
             </p>
           </div>
 
@@ -506,7 +516,7 @@ export default function ApiDocsPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex gap-4 text-sm">
               <Link href="/terms" className="hover:underline">

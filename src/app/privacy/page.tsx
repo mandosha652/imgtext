@@ -3,8 +3,12 @@ import { Languages, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Privacy Policy — OCR Translate',
-  description: 'Privacy Policy for OCR Translate.',
+  title: 'Privacy Policy',
+  description:
+    'Learn how ImgText collects, uses, and protects your data — including uploaded images, account info, and cookies.',
+  alternates: {
+    canonical: '/privacy',
+  },
 };
 
 export default function PrivacyPage() {
@@ -14,7 +18,7 @@ export default function PrivacyPage() {
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold">ImgText</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
@@ -38,7 +42,7 @@ export default function PrivacyPage() {
                 1. Information We Collect
               </h2>
               <p className="text-muted-foreground">
-                We collect the following information when you use OCR Translate:
+                We collect the following information when you use ImgText:
               </p>
               <ul className="text-muted-foreground list-disc space-y-1 pl-6">
                 <li>
@@ -178,7 +182,7 @@ export default function PrivacyPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex gap-4 text-sm">
               <Link href="/terms" className="hover:underline">

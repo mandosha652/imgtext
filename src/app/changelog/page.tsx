@@ -4,8 +4,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: "What's New — OCR Translate",
-  description: 'Latest updates, improvements, and fixes to OCR Translate.',
+  title: "What's New",
+  description: 'Latest updates, improvements, and fixes to ImgText.',
+  openGraph: {
+    title: "What's New | ImgText",
+    description: 'Latest updates, improvements, and fixes to ImgText.',
+    url: '/changelog',
+  },
+  alternates: {
+    canonical: '/changelog',
+  },
 };
 
 interface Release {
@@ -133,7 +141,7 @@ export default function ChangelogPage() {
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold">ImgText</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
@@ -187,7 +195,7 @@ export default function ChangelogPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex gap-4 text-sm">
               <Link href="/terms" className="hover:underline">

@@ -11,8 +11,18 @@ import {
 import { FaqAccordion } from '@/components/features/help/FaqAccordion';
 
 export const metadata = {
-  title: 'Help & FAQ — OCR Translate',
-  description: 'Frequently asked questions and support for OCR Translate.',
+  title: 'Help & FAQ',
+  description:
+    'Answers to common questions about ImgText — image formats, languages, batches, API keys, and more.',
+  openGraph: {
+    title: 'Help & FAQ | ImgText',
+    description:
+      'Answers to common questions about ImgText — image formats, languages, batches, API keys, and more.',
+    url: '/help',
+  },
+  alternates: {
+    canonical: '/help',
+  },
 };
 
 const faqs = [
@@ -46,7 +56,7 @@ const faqs = [
   },
   {
     q: 'What are API keys for?',
-    a: 'API keys let you call the OCR Translate REST API directly from your own code or pipeline — without logging into the web app. Create and manage keys in Settings. Treat them like passwords; do not expose them in client-side code.',
+    a: 'API keys let you call the ImgText REST API directly from your own code or pipeline — without logging into the web app. Create and manage keys in Settings. Treat them like passwords; do not expose them in client-side code.',
   },
   {
     q: 'What happens when I delete my account?',
@@ -62,14 +72,31 @@ const faqs = [
   },
 ];
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(faq => ({
+    '@type': 'Question',
+    name: faq.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: faq.a,
+    },
+  })),
+};
+
 export default function HelpPage() {
   return (
     <div className="flex min-h-screen flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold">OCR Translate</span>
+            <span className="text-lg font-semibold">ImgText</span>
           </Link>
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
@@ -88,7 +115,7 @@ export default function HelpPage() {
               <h1 className="text-3xl font-bold">Help &amp; FAQ</h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Answers to common questions about OCR Translate.
+              Answers to common questions about ImgText.
             </p>
           </div>
 
@@ -99,7 +126,7 @@ export default function HelpPage() {
                 <CardHeader>
                   <CardTitle className="text-base">API Reference</CardTitle>
                   <CardDescription>
-                    Integrate OCR Translate into your pipeline
+                    Integrate ImgText into your pipeline
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -151,7 +178,7 @@ export default function HelpPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex gap-4 text-sm">
               <Link
