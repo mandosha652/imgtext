@@ -89,37 +89,43 @@ function ForgotPasswordForm() {
           Enter your email and we&apos;ll send you a reset link
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-destructive text-sm">{errors.email.message}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Send reset link
-          </Button>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            Remember your password?{' '}
-            <Link
-              href="/login"
-              className="text-primary focus-visible:ring-ring/50 rounded hover:underline focus-visible:ring-2 focus-visible:outline-none"
-            >
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
+      <form onSubmit={handleSubmit(onSubmit)} aria-busy={isLoading}>
+        <fieldset disabled={isLoading}>
+          <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send reset link
+            </Button>
+            <p className="text-muted-foreground text-center text-xs sm:text-sm">
+              Remember your password?{' '}
+              <Link
+                href="/login"
+                className="text-primary focus-visible:ring-ring/50 rounded hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                tabIndex={isLoading ? -1 : undefined}
+                aria-disabled={isLoading}
+              >
+                Sign in
+              </Link>
+            </p>
+          </CardFooter>
+        </fieldset>
       </form>
     </Card>
   );

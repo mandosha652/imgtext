@@ -35,7 +35,11 @@ import { AxiosError } from 'axios';
 function LoginForm() {
   const { loginAsync, isLoggingIn } = useAuth();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const rawCallback = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl =
+    rawCallback.startsWith('/') && !rawCallback.startsWith('//')
+      ? rawCallback
+      : '/dashboard';
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -80,77 +84,88 @@ function LoginForm() {
           Enter your email and password to access your account
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-destructive text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link
-                href="/forgot-password"
-                className="text-muted-foreground hover:text-primary focus-visible:ring-ring/50 rounded text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <div className="relative">
+      <form onSubmit={handleSubmit(onSubmit)} aria-busy={isLoggingIn}>
+        <fieldset disabled={isLoggingIn}>
+          <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                {...register('password')}
-                className="pr-10"
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                {...register('email')}
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowPassword(!showPassword)}
-                title={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4 transition-opacity" />
-                ) : (
-                  <Eye className="text-muted-foreground h-4 w-4 transition-opacity" />
-                )}
-                <span className="sr-only">
-                  {showPassword ? 'Hide password' : 'Show password'}
-                </span>
-              </Button>
+              {errors.email && (
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
-            {errors.password && (
-              <p className="text-destructive text-sm">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
-          <Button type="submit" className="w-full" disabled={isLoggingIn}>
-            {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign in
-          </Button>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-primary hover:underline">
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-muted-foreground hover:text-primary focus-visible:ring-ring/50 rounded text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  tabIndex={isLoggingIn ? -1 : undefined}
+                  aria-disabled={isLoggingIn}
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  {...register('password')}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4 transition-opacity" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4 transition-opacity" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? 'Hide password' : 'Show password'}
+                  </span>
+                </Button>
+              </div>
+              {errors.password && (
+                <p className="text-destructive text-sm">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
+            <Button type="submit" className="w-full" disabled={isLoggingIn}>
+              {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign in
+            </Button>
+            <p className="text-muted-foreground text-center text-xs sm:text-sm">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup"
+                className="text-primary hover:underline"
+                tabIndex={isLoggingIn ? -1 : undefined}
+                aria-disabled={isLoggingIn}
+              >
+                Sign up
+              </Link>
+            </p>
+          </CardFooter>
+        </fieldset>
       </form>
     </Card>
   );

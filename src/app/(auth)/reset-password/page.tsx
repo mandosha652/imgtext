@@ -117,89 +117,96 @@ function ResetPasswordForm() {
           Enter your new password below
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
-          <div className="space-y-2">
-            <Label htmlFor="new_password">New password</Label>
-            <div className="relative">
-              <Input
-                id="new_password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Create a new password"
-                autoComplete="new-password"
-                {...register('new_password')}
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4" />
-                ) : (
-                  <Eye className="text-muted-foreground h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {showPassword ? 'Hide password' : 'Show password'}
-                </span>
-              </Button>
+      <form onSubmit={handleSubmit(onSubmit)} aria-busy={isLoading}>
+        <fieldset disabled={isLoading}>
+          <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
+            <div className="space-y-2">
+              <Label htmlFor="new_password">New password</Label>
+              <div className="relative">
+                <Input
+                  id="new_password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Create a new password"
+                  autoComplete="new-password"
+                  {...register('new_password')}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? 'Hide password' : 'Show password'}
+                  </span>
+                </Button>
+              </div>
+              {errors.new_password && (
+                <p className="text-destructive text-sm">
+                  {errors.new_password.message}
+                </p>
+              )}
             </div>
-            {errors.new_password && (
-              <p className="text-destructive text-sm">
-                {errors.new_password.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm new password</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm your new password"
-                autoComplete="new-password"
-                {...register('confirmPassword')}
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4" />
-                ) : (
-                  <Eye className="text-muted-foreground h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {showConfirmPassword ? 'Hide password' : 'Show password'}
-                </span>
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm your new password"
+                  autoComplete="new-password"
+                  {...register('confirmPassword')}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showConfirmPassword ? 'Hide password' : 'Show password'}
+                  </span>
+                </Button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-destructive text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="text-destructive text-sm">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Set new password
-          </Button>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            Remember your password?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Set new password
+            </Button>
+            <p className="text-muted-foreground text-center text-xs sm:text-sm">
+              Remember your password?{' '}
+              <Link
+                href="/login"
+                className="text-primary hover:underline"
+                tabIndex={isLoading ? -1 : undefined}
+                aria-disabled={isLoading}
+              >
+                Sign in
+              </Link>
+            </p>
+          </CardFooter>
+        </fieldset>
       </form>
     </Card>
   );

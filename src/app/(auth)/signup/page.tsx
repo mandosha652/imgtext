@@ -44,7 +44,11 @@ function getPasswordStrength(password: string): {
 function SignupForm() {
   const { registerAsync, isRegistering } = useAuth();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const rawCallback = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl =
+    rawCallback.startsWith('/') && !rawCallback.startsWith('//')
+      ? rawCallback
+      : '/dashboard';
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordValue, setPasswordValue] = useState('');
@@ -61,7 +65,7 @@ function SignupForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const result = await registerAsync(
+      await registerAsync(
         {
           email: data.email,
           password: data.password,
@@ -69,10 +73,7 @@ function SignupForm() {
         },
         callbackUrl
       );
-      toast.success('Account created successfully!', {
-        description: `Your API key: ${result.api_key.slice(0, 12)}... (Check your dashboard)`,
-        duration: 10000,
-      });
+      toast.success('Welcome to imgtext.io! 🎉');
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast.error(
@@ -91,135 +92,145 @@ function SignupForm() {
           Enter your details to create your account
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name (optional)</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-              {...register('name')}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-destructive text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
+      <form onSubmit={handleSubmit(onSubmit)} aria-busy={isRegistering}>
+        <fieldset disabled={isRegistering}>
+          <CardContent className="space-y-4 px-4 sm:space-y-6 sm:px-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name (optional)</Label>
               <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Create a password"
-                autoComplete="new-password"
-                {...register('password')}
-                className="pr-10"
-                onChange={e => setPasswordValue(e.target.value)}
+                id="name"
+                type="text"
+                placeholder="Your name"
+                autoComplete="name"
+                {...register('name')}
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowPassword(!showPassword)}
-                title={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4" />
-                ) : (
-                  <Eye className="text-muted-foreground h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {showPassword ? 'Hide password' : 'Show password'}
-                </span>
-              </Button>
             </div>
-            {passwordValue && (
-              <div className="space-y-1">
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <div
-                      key={i}
-                      className={`h-1 flex-1 rounded-full transition-colors ${
-                        i <= strength.score ? strength.color : 'bg-muted'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  {strength.label}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
                 </p>
-              </div>
-            )}
-            {errors.password && (
-              <p className="text-destructive text-sm">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm your password"
-                autoComplete="new-password"
-                {...register('confirmPassword')}
-                className="pr-10"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                title={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="text-muted-foreground h-4 w-4" />
-                ) : (
-                  <Eye className="text-muted-foreground h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {showConfirmPassword ? 'Hide password' : 'Show password'}
-                </span>
-              </Button>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="text-destructive text-sm">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
-          <Button type="submit" className="w-full" disabled={isRegistering}>
-            {isRegistering && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create account
-          </Button>
-          <p className="text-muted-foreground text-center text-xs sm:text-sm">
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              className="text-primary focus-visible:ring-ring/50 rounded hover:underline focus-visible:ring-2 focus-visible:outline-none"
-            >
-              Sign in
-            </Link>
-          </p>
-        </CardFooter>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                  {...register('password')}
+                  className="pr-10"
+                  onChange={e => setPasswordValue(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? 'Hide password' : 'Show password'}
+                  </span>
+                </Button>
+              </div>
+              {passwordValue && (
+                <div className="space-y-1">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          i <= strength.score ? strength.color : 'bg-muted'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    {strength.label}
+                  </p>
+                </div>
+              )}
+              {errors.password && (
+                <p className="text-destructive text-sm">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm your password"
+                  autoComplete="new-password"
+                  {...register('confirmPassword')}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  title={
+                    showConfirmPassword ? 'Hide password' : 'Show password'
+                  }
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="text-muted-foreground h-4 w-4" />
+                  ) : (
+                    <Eye className="text-muted-foreground h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showConfirmPassword ? 'Hide password' : 'Show password'}
+                  </span>
+                </Button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-destructive text-sm">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
+            <Button type="submit" className="w-full" disabled={isRegistering}>
+              {isRegistering && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Create account
+            </Button>
+            <p className="text-muted-foreground text-center text-xs sm:text-sm">
+              Already have an account?{' '}
+              <Link
+                href="/login"
+                className="text-primary focus-visible:ring-ring/50 rounded hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                tabIndex={isRegistering ? -1 : undefined}
+                aria-disabled={isRegistering}
+              >
+                Sign in
+              </Link>
+            </p>
+          </CardFooter>
+        </fieldset>
       </form>
     </Card>
   );
