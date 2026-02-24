@@ -1,8 +1,6 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight,
   Languages,
   Eraser,
   Layers,
@@ -11,20 +9,33 @@ import {
   ImageDown,
   MoveRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/store/authStore';
+import {
+  HomeNavActions,
+  HeroCTAActions,
+  BottomCTAAction,
+} from '@/components/features/home/HomeActions';
+
+export const metadata: Metadata = {
+  title: 'ImgText — AI-Powered Image Translation',
+  description:
+    'Translate text in images instantly using AI-powered OCR and translation. Upload an image, get a translated image back — text rendered in the same position. Supports 11 European languages.',
+  openGraph: {
+    title: 'ImgText — AI-Powered Image Translation',
+    description:
+      'Upload an image with text, get a translated image back. AI-powered OCR removes the original text and renders the translation in place. Supports 11 European languages.',
+    url: '/',
+  },
+  twitter: {
+    title: 'ImgText — AI-Powered Image Translation',
+    description:
+      'Upload an image with text, get a translated image back. AI-powered OCR + translation in one step.',
+  },
+  alternates: {
+    canonical: '/',
+  },
+};
 
 export default function HomePage() {
-  const isDevBypass = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-
-  const primaryCTA = isAuthenticated || isDevBypass ? '/translate' : '/signup';
-  const secondaryCTA = isAuthenticated || isDevBypass ? '/dashboard' : '/login';
-  const primaryLabel =
-    isAuthenticated || isDevBypass ? 'Start Translating' : 'Get Started';
-  const secondaryLabel =
-    isAuthenticated || isDevBypass ? 'Dashboard' : 'Sign in';
-
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -35,20 +46,9 @@ export default function HomePage() {
             className="focus-visible:ring-ring/50 flex items-center gap-2 rounded focus-visible:ring-2 focus-visible:outline-none"
           >
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold sm:text-xl">
-              OCR Translate
-            </span>
+            <span className="text-lg font-semibold sm:text-xl">ImgText</span>
           </Link>
-          <nav className="flex items-center gap-2 sm:gap-4">
-            <Link href={secondaryCTA}>
-              <Button variant="ghost" size="sm">
-                {secondaryLabel}
-              </Button>
-            </Link>
-            <Link href={primaryCTA}>
-              <Button size="sm">{primaryLabel}</Button>
-            </Link>
-          </nav>
+          <HomeNavActions />
         </div>
       </header>
 
@@ -67,18 +67,7 @@ export default function HomePage() {
               original, translate it, and render it back onto the image — in the
               same position. You get a ready-to-use image, not a text box.
             </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href={primaryCTA}>
-                <Button size="lg" className="gap-2">
-                  {primaryLabel} <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href={secondaryCTA}>
-                <Button size="lg" variant="outline">
-                  {secondaryLabel}
-                </Button>
-              </Link>
-            </div>
+            <HeroCTAActions />
           </div>
         </section>
 
@@ -312,11 +301,7 @@ export default function HomePage() {
                 No boxes, no transcripts, no copy-pasting. Your image — with the
                 text translated in place.
               </p>
-              <Link href={primaryCTA} className="mt-8">
-                <Button size="lg" className="gap-2">
-                  {primaryLabel} <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
+              <BottomCTAAction />
             </div>
           </div>
         </section>
@@ -328,7 +313,7 @@ export default function HomePage() {
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center gap-2">
               <Languages className="h-5 w-5" />
-              <span className="font-semibold">OCR Translate</span>
+              <span className="font-semibold">ImgText</span>
             </div>
             <div className="text-muted-foreground flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
               <Link
@@ -357,8 +342,7 @@ export default function HomePage() {
               </Link>
             </div>
             <p className="text-muted-foreground text-center text-xs sm:text-sm">
-              &copy; {new Date().getFullYear()} OCR Translate. All rights
-              reserved.
+              &copy; {new Date().getFullYear()} ImgText. All rights reserved.
             </p>
           </div>
         </div>
