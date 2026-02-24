@@ -14,6 +14,12 @@ const DEV_USER: User = {
   created_at: new Date().toISOString(),
 };
 
+// Check if access_token cookie exists (matches client.ts cookie name)
+const hasAccessTokenCookie = (): boolean => {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.split('; ').some(c => c.startsWith('access_token='));
+};
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -55,6 +61,15 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => state => {
+        // After hydrating from localStorage, verify cookies still exist.
+        // If tokens were cleared (logout, 401 redirect, backend wipe) but
+        // localStorage wasn't cleaned up, reset to logged-out state.
+        if (shouldBypassAuth || !state) return;
+        if (state.isAuthenticated && !hasAccessTokenCookie()) {
+          state.setUser(null);
+        }
+      },
     }
   )
 );

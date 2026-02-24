@@ -139,6 +139,7 @@ apiClient.interceptors.response.use(
       const refreshToken = tokenStorage.getRefreshToken();
       if (!refreshToken) {
         tokenStorage.clearTokens();
+        localStorage.removeItem('auth-storage');
         window.location.href = '/login';
         return Promise.reject(error);
       }
@@ -165,6 +166,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null);
         tokenStorage.clearTokens();
+        localStorage.removeItem('auth-storage');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
