@@ -89,9 +89,7 @@ export function DashboardNav() {
             className="focus-visible:ring-ring/50 flex items-center gap-2 rounded focus-visible:ring-2 focus-visible:outline-none"
           >
             <Languages className="h-6 w-6" />
-            <span className="text-lg font-semibold sm:text-xl">
-              OCR Translate
-            </span>
+            <span className="text-lg font-semibold sm:text-xl">ImgText</span>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
             {navItems.map(item => (

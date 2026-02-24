@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import { DashboardNav } from '@/components/layout/DashboardNav';
 import { VerificationBanner } from '@/components/layout/VerificationBanner';
 import { OfflineBanner } from '@/components/layout/OfflineBanner';
 import { DevBypassBanner } from '@/components/layout/DevBypassBanner';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function DashboardLayout({
   children,

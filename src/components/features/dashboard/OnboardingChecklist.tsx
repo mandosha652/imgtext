@@ -56,7 +56,7 @@ const STEPS: Step[] = [
     id: 'api_key',
     label: 'Set up API access',
     description:
-      'Create an API key to integrate OCR Translate into your own workflows.',
+      'Create an API key to integrate ImgText into your own workflows.',
     href: '/settings',
     icon: Key,
     cta: 'Go to Settings',
