@@ -62,6 +62,33 @@ export function useAdminImpersonateUser() {
   });
 }
 
+export function useAdminResendVerification() {
+  return useMutation({
+    mutationFn: (userId: string) => adminApi.resendVerification(userId),
+  });
+}
+
+export function useAdminUserApiKeys(userId: string) {
+  return useQuery({
+    queryKey: ['admin', 'users', userId, 'api-keys'],
+    queryFn: () => adminApi.getUserApiKeys(userId),
+    enabled: adminKeyStorage.has() && !!userId,
+  });
+}
+
+export function useAdminRevokeUserApiKey() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, keyId }: { userId: string; keyId: string }) =>
+      adminApi.revokeUserApiKey(userId, keyId),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['admin', 'users', userId, 'api-keys'],
+      });
+    },
+  });
+}
+
 export function useAdminBatches(params: AdminBatchesParams = {}) {
   return useQuery({
     queryKey: ['admin', 'batches', params],
@@ -85,6 +112,46 @@ export function useAdminDeleteBatch() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'batches'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+    },
+  });
+}
+
+export function useAdminCancelBatch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (batchId: string) => adminApi.cancelBatch(batchId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'batches'] });
+    },
+  });
+}
+
+export function useAdminRetryBatch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (batchId: string) => adminApi.retryBatch(batchId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'batches'] });
+    },
+  });
+}
+
+export function useAdminResumeStuckBatches() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => adminApi.resumeStuckBatches(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'batches'] });
+    },
+  });
+}
+
+export function useAdminRetryImage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (imageId: string) => adminApi.retryImage(imageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'batches'] });
     },
   });
 }
@@ -117,5 +184,47 @@ export function useAdminCostByUser(
     queryFn: () => adminApi.getCostByUser(period),
     enabled: adminKeyStorage.has(),
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useAdminHealth() {
+  return useQuery({
+    queryKey: ['admin', 'health'],
+    queryFn: () => adminApi.getHealth(),
+    enabled: adminKeyStorage.has(),
+    staleTime: 0,
+  });
+}
+
+export function useAdminHealthServices() {
+  return useQuery({
+    queryKey: ['admin', 'health', 'services'],
+    queryFn: () => adminApi.getHealthServices(),
+    enabled: adminKeyStorage.has(),
+    staleTime: 0,
+  });
+}
+
+export function useAdminLastCleanupRun() {
+  return useQuery({
+    queryKey: ['admin', 'cleanup', 'last-run'],
+    queryFn: () => adminApi.getLastCleanupRun(),
+    enabled: adminKeyStorage.has(),
+  });
+}
+
+export function useAdminRunCleanup() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => adminApi.runCleanup(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'cleanup'] });
+    },
+  });
+}
+
+export function useAdminWipeTenantFiles() {
+  return useMutation({
+    mutationFn: (tenantId: string) => adminApi.wipeTenantFiles(tenantId),
   });
 }

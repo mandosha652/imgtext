@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Users,
-  Image,
+  Image as ImageIcon,
   Layers,
   Activity,
   TrendingUp,
@@ -11,63 +12,44 @@ import {
   Clock,
   CheckCircle,
   DollarSign,
+  ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   useAdminStats,
   useAdminCostSummary,
   useAdminCostByUser,
 } from '@/hooks';
-
-function StatCard({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  highlight,
-}: {
-  label: string;
-  value: number | string;
-  sub?: string;
-  icon: React.ElementType;
-  highlight?: boolean;
-}) {
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-muted-foreground text-sm">{label}</p>
-            <p
-              className={`mt-1 text-3xl font-bold ${highlight ? 'text-orange-500' : ''}`}
-            >
-              {value.toLocaleString()}
-            </p>
-            {sub && <p className="text-muted-foreground mt-1 text-xs">{sub}</p>}
-          </div>
-          <div className="bg-muted rounded-lg p-2">
-            <Icon className="h-5 w-5" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <h2 className="text-muted-foreground mt-8 mb-3 text-xs font-semibold tracking-widest uppercase">
-      {title}
-    </h2>
-  );
-}
+import { StatCard, SectionHeader } from './_components/stat-card';
+import { DailyCostChart } from './_components/daily-cost-chart';
+import { ServiceHealthSection } from './_components/service-health-section';
+import { BrokerHealthCard } from './_components/broker-health-card';
+import { CleanupSection } from './_components/cleanup-section';
 
 type CostPeriod = 'today' | 'week' | 'month' | 'alltime';
 
+const PERIOD_LABELS: Record<CostPeriod, string> = {
+  today: 'Today',
+  week: 'Week',
+  month: 'Month',
+  alltime: 'All time',
+};
+
 function fmt(val: number | null | undefined): string {
-  if (val == null) return '—';
+  if (val == null) return '\u2014';
   return `$${val.toFixed(4)}`;
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="bg-muted h-[72px] animate-pulse rounded-xl" />
+      ))}
+    </div>
+  );
 }
 
 export default function AdminOverviewPage() {
@@ -79,19 +61,25 @@ export default function AdminOverviewPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <p className="text-muted-foreground animate-pulse">
-          Loading platform stats...
-        </p>
+      <div className="space-y-8">
+        <div>
+          <div className="bg-muted mb-1 h-8 w-48 animate-pulse rounded" />
+          <div className="bg-muted h-4 w-64 animate-pulse rounded" />
+        </div>
+        <StatsSkeleton />
+        <StatsSkeleton />
+        <StatsSkeleton />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center gap-2">
-        <AlertTriangle className="text-destructive h-8 w-8" />
-        <p className="text-destructive font-medium">Failed to load stats</p>
+      <div className="flex h-64 flex-col items-center justify-center gap-3">
+        <div className="bg-destructive/10 rounded-full p-3">
+          <AlertTriangle className="text-destructive h-6 w-6" />
+        </div>
+        <p className="font-semibold">Failed to load stats</p>
         <p className="text-muted-foreground text-sm">
           Check your admin key and try again
         </p>
@@ -103,15 +91,33 @@ export default function AdminOverviewPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Platform Overview</h1>
-        <p className="text-muted-foreground text-sm">
-          Live metrics across all tenants
-        </p>
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Platform Overview</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            Live metrics across all tenants
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/admin/users">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Users className="h-3.5 w-3.5" />
+              Users
+              <ArrowRight className="text-muted-foreground h-3 w-3" />
+            </Button>
+          </Link>
+          <Link href="/admin/batches">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Layers className="h-3.5 w-3.5" />
+              Batches
+              <ArrowRight className="text-muted-foreground h-3 w-3" />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <SectionHeader title="Users" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Users" value={stats.total_users} icon={Users} />
         <StatCard
           label="Active Users"
@@ -126,35 +132,39 @@ export default function AdminOverviewPage() {
           icon={TrendingUp}
           highlight={stats.new_users_today > 0}
         />
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground text-sm">Tier Breakdown</p>
+        <Card className="overflow-hidden">
+          <CardContent className="px-4 py-4">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              Tier Breakdown
+            </p>
             <div className="mt-3 space-y-1.5">
               <div className="flex items-center justify-between">
                 <Badge variant="outline" className="text-xs">
                   Free
                 </Badge>
-                <span className="font-semibold">
+                <span className="text-sm font-semibold tabular-nums">
                   {stats.users_by_tier.free}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <Badge
                   variant="outline"
-                  className="border-blue-300 text-xs text-blue-600"
+                  className="border-blue-300 bg-blue-50 text-xs text-blue-700 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
                 >
                   Pro
                 </Badge>
-                <span className="font-semibold">{stats.users_by_tier.pro}</span>
+                <span className="text-sm font-semibold tabular-nums">
+                  {stats.users_by_tier.pro}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <Badge
                   variant="outline"
-                  className="border-purple-300 text-xs text-purple-600"
+                  className="border-purple-300 bg-purple-50 text-xs text-purple-700 dark:border-purple-700 dark:bg-purple-950/40 dark:text-purple-400"
                 >
                   Enterprise
                 </Badge>
-                <span className="font-semibold">
+                <span className="text-sm font-semibold tabular-nums">
                   {stats.users_by_tier.enterprise}
                 </span>
               </div>
@@ -164,20 +174,20 @@ export default function AdminOverviewPage() {
       </div>
 
       <SectionHeader title="Batches" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Batches"
           value={stats.total_batches}
           icon={Layers}
         />
         <StatCard
-          label="Batches Today"
+          label="Today"
           value={stats.batches_today}
           icon={Activity}
           highlight={stats.batches_today > 0}
         />
         <StatCard
-          label="Pending"
+          label="Pending / Processing"
           value={stats.pending_batches}
           sub={`${stats.processing_batches} processing`}
           icon={Clock}
@@ -192,12 +202,12 @@ export default function AdminOverviewPage() {
       </div>
 
       <SectionHeader title="Usage" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Images Processed"
           value={stats.total_images_processed}
           sub={`${stats.images_processed_today} today`}
-          icon={Image}
+          icon={ImageIcon}
         />
         <StatCard
           label="Total Translations"
@@ -210,24 +220,28 @@ export default function AdminOverviewPage() {
           value={stats.ocr_calls_today}
           icon={Activity}
         />
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-muted-foreground text-sm">API Calls Today</p>
+        <Card className="overflow-hidden">
+          <CardContent className="px-4 py-4">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              API Calls Today
+            </p>
             <div className="mt-3 space-y-1.5">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">OCR</span>
-                <span className="font-semibold">{stats.ocr_calls_today}</span>
+                <span className="font-semibold tabular-nums">
+                  {stats.ocr_calls_today.toLocaleString()}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Translate</span>
-                <span className="font-semibold">
-                  {stats.translate_calls_today}
+                <span className="font-semibold tabular-nums">
+                  {stats.translate_calls_today.toLocaleString()}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Inpaint</span>
-                <span className="font-semibold">
-                  {stats.inpaint_calls_today}
+                <span className="font-semibold tabular-nums">
+                  {stats.inpaint_calls_today.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -235,62 +249,66 @@ export default function AdminOverviewPage() {
         </Card>
       </div>
 
-      {/* ── Costs & Profitability ── */}
-      <div className="mt-8 mb-3 flex items-center justify-between">
+      <div className="mt-8 mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-          Costs & Profitability
+          Costs &amp; Profitability
         </h2>
-        <div className="flex gap-1">
-          {(['today', 'week', 'month', 'alltime'] as CostPeriod[]).map(p => (
+        <div className="flex rounded-lg border p-0.5">
+          {(Object.keys(PERIOD_LABELS) as CostPeriod[]).map(p => (
             <button
               key={p}
               onClick={() => setCostPeriod(p)}
-              className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+              className={`focus-visible:ring-ring/50 cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none sm:px-3 ${
                 costPeriod === p
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              {p === 'alltime'
-                ? 'All time'
-                : p.charAt(0).toUpperCase() + p.slice(1)}
+              {PERIOD_LABELS[p]}
             </button>
           ))}
         </div>
       </div>
 
       {costLoading ? (
-        <p className="text-muted-foreground animate-pulse text-sm">
-          Loading cost data...
-        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-muted h-[72px] animate-pulse rounded-xl"
+            />
+          ))}
+        </div>
       ) : costSummary ? (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Total */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-muted-foreground text-sm">Total Spend</p>
-                    <p className="mt-1 text-3xl font-bold text-emerald-600">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Card className="overflow-hidden border-emerald-200 dark:border-emerald-800">
+              <CardContent className="p-0">
+                <div className="flex items-stretch">
+                  <div className="flex w-12 shrink-0 items-center justify-center bg-emerald-500/10">
+                    <DollarSign className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div className="flex-1 px-4 py-4">
+                    <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Total Spend
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-emerald-600 tabular-nums">
                       {fmt(costSummary.total_cost_usd)}
                     </p>
                     <p className="text-muted-foreground mt-1 text-xs">
-                      combined all providers
+                      all providers combined
                     </p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-2">
-                    <DollarSign className="h-5 w-5" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Vision */}
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground text-sm">Google Vision</p>
-                <p className="mt-1 text-3xl font-bold">
+            <Card className="overflow-hidden">
+              <CardContent className="px-4 py-4">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  Google Vision
+                </p>
+                <p className="mt-1 text-2xl font-bold tabular-nums">
                   {fmt(costSummary.vision.cost_usd)}
                 </p>
                 <p className="text-muted-foreground mt-1 text-xs">
@@ -299,71 +317,78 @@ export default function AdminOverviewPage() {
               </CardContent>
             </Card>
 
-            {/* OpenAI */}
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground text-sm">OpenAI GPT-4o</p>
+            <Card className="overflow-hidden">
+              <CardContent className="px-4 py-4">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  OpenAI GPT-4o
+                </p>
                 {costSummary.openai.error ? (
                   <p className="mt-1 text-sm text-orange-500">
                     {costSummary.openai.error}
                   </p>
                 ) : (
-                  <p className="mt-1 text-3xl font-bold">
+                  <p className="mt-1 text-2xl font-bold tabular-nums">
                     {fmt(costSummary.openai.cost_usd)}
                   </p>
                 )}
                 <p className="text-muted-foreground mt-1 text-xs">
-                  real data from OpenAI API
+                  via OpenAI billing API
                 </p>
               </CardContent>
             </Card>
 
-            {/* Replicate */}
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground text-sm">Replicate LaMa</p>
+            <Card className="overflow-hidden">
+              <CardContent className="px-4 py-4">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  Replicate LaMa
+                </p>
                 {costSummary.replicate.error ? (
                   <p className="mt-1 text-sm text-orange-500">
                     {costSummary.replicate.error}
                   </p>
                 ) : (
-                  <p className="mt-1 text-3xl font-bold">
+                  <p className="mt-1 text-2xl font-bold tabular-nums">
                     {fmt(costSummary.replicate.cost_usd)}
                   </p>
                 )}
                 <p className="text-muted-foreground mt-1 text-xs">
                   {costSummary.replicate.predictions} predictions
                   {costSummary.replicate.total_seconds != null &&
-                    ` · ${costSummary.replicate.total_seconds.toFixed(1)}s`}
+                    ` \u00b7 ${costSummary.replicate.total_seconds.toFixed(1)}s`}
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Top users by cost */}
+          <DailyCostChart />
+
           {userCosts && userCosts.length > 0 && (
             <Card className="mt-4">
-              <CardContent className="pt-6">
-                <p className="text-muted-foreground mb-3 text-sm font-medium">
+              <CardContent className="pt-5 pb-4">
+                <p className="mb-3 text-sm font-medium">
                   Top Users by Vision Spend
                 </p>
                 <div className="space-y-2">
-                  {userCosts.slice(0, 5).map(row => (
+                  {userCosts.slice(0, 5).map((row, i) => (
                     <div
                       key={row.user_id}
-                      className="flex items-center justify-between text-sm"
+                      className="flex items-center gap-3 text-sm"
                     >
-                      <span className="text-muted-foreground font-mono text-xs">
-                        {row.user_id.slice(0, 8)}…
+                      <span className="text-muted-foreground w-4 shrink-0 text-xs tabular-nums">
+                        {i + 1}
                       </span>
-                      <div className="flex gap-4">
-                        <span className="text-muted-foreground">
-                          {row.images_processed.toLocaleString()} imgs
-                        </span>
-                        <span className="font-semibold">
-                          {fmt(row.vision_cost_usd)}
-                        </span>
-                      </div>
+                      <Link
+                        href={`/admin/users/${row.user_id}`}
+                        className="text-muted-foreground hover:text-foreground min-w-0 flex-1 truncate font-mono text-xs transition-colors"
+                      >
+                        {row.user_id}
+                      </Link>
+                      <span className="text-muted-foreground hidden shrink-0 text-xs sm:inline">
+                        {row.images_processed.toLocaleString()} imgs
+                      </span>
+                      <span className="w-16 shrink-0 text-right font-semibold tabular-nums sm:w-20">
+                        {fmt(row.vision_cost_usd)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -372,6 +397,13 @@ export default function AdminOverviewPage() {
           )}
         </>
       ) : null}
+
+      <SectionHeader title="System" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ServiceHealthSection />
+        <BrokerHealthCard />
+        <CleanupSection />
+      </div>
     </div>
   );
 }

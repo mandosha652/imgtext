@@ -311,6 +311,26 @@ export interface AdminImpersonateResponse {
   expires_in_seconds: number;
 }
 
+export interface AdminResendVerificationResponse {
+  queued: boolean;
+  detail: string;
+}
+
+export interface AdminApiKey {
+  id: string;
+  name: string;
+  prefix: string;
+  is_active: boolean;
+  last_used_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface AdminQueuedResponse {
+  queued: boolean;
+  detail: string;
+}
+
 export interface AdminBatchImage {
   id: string;
   original_filename: string;
@@ -413,6 +433,40 @@ export interface AdminUserCostRow {
   translate_calls: number;
   inpaint_calls: number;
   vision_cost_usd: number;
+}
+
+export interface ServiceHealthResult {
+  name: string;
+  reachable: boolean;
+  latency_ms: number | null;
+  error?: string;
+}
+
+export interface AdminHealthServicesResponse {
+  checked_at: string;
+  services: ServiceHealthResult[];
+}
+
+export interface AdminCleanupResult {
+  ran_at: string;
+  batches_expired: number;
+  singles_expired: number;
+  triggered_by: string;
+}
+
+export interface AdminTenantFilesWipeResponse {
+  tenant_id: string;
+  files_deleted: number;
+  errors: number;
+}
+
+export interface AppHealthResponse {
+  status: string;
+  broker: {
+    status: string;
+    reachable: boolean;
+    error?: string;
+  };
 }
 
 // =============================================================================

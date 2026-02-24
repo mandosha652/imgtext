@@ -6,12 +6,19 @@ import type {
   AdminUserDetail,
   AdminUpdateUser,
   AdminImpersonateResponse,
+  AdminResendVerificationResponse,
+  AdminApiKey,
+  AdminQueuedResponse,
   AdminBatchSummary,
   AdminBatchDetail,
   AdminPaginatedResponse,
   AdminCostSummary,
   AdminDailyCostEntry,
   AdminUserCostRow,
+  AdminHealthServicesResponse,
+  AdminCleanupResult,
+  AdminTenantFilesWipeResponse,
+  AppHealthResponse,
 } from '@/types';
 
 const ADMIN_KEY_STORAGE = 'admin_secret_key';
@@ -115,6 +122,26 @@ export const adminApi = {
     return res.data;
   },
 
+  resendVerification: async (
+    userId: string
+  ): Promise<AdminResendVerificationResponse> => {
+    const res = await adminClient.post<AdminResendVerificationResponse>(
+      ENDPOINTS.ADMIN_USER_RESEND_VERIFICATION(userId)
+    );
+    return res.data;
+  },
+
+  getUserApiKeys: async (userId: string): Promise<AdminApiKey[]> => {
+    const res = await adminClient.get<AdminApiKey[]>(
+      ENDPOINTS.ADMIN_USER_API_KEYS(userId)
+    );
+    return res.data;
+  },
+
+  revokeUserApiKey: async (userId: string, keyId: string): Promise<void> => {
+    await adminClient.delete(ENDPOINTS.ADMIN_USER_API_KEY(userId, keyId));
+  },
+
   listBatches: async (
     params: AdminBatchesParams = {}
   ): Promise<AdminPaginatedResponse<AdminBatchSummary>> => {
@@ -137,6 +164,34 @@ export const adminApi = {
 
   deleteBatch: async (batchId: string): Promise<void> => {
     await adminClient.delete(ENDPOINTS.ADMIN_BATCH(batchId));
+  },
+
+  cancelBatch: async (batchId: string): Promise<AdminBatchSummary> => {
+    const res = await adminClient.post<AdminBatchSummary>(
+      ENDPOINTS.ADMIN_BATCH_CANCEL(batchId)
+    );
+    return res.data;
+  },
+
+  retryBatch: async (batchId: string): Promise<AdminQueuedResponse> => {
+    const res = await adminClient.post<AdminQueuedResponse>(
+      ENDPOINTS.ADMIN_BATCH_RETRY(batchId)
+    );
+    return res.data;
+  },
+
+  resumeStuckBatches: async (): Promise<AdminQueuedResponse> => {
+    const res = await adminClient.post<AdminQueuedResponse>(
+      ENDPOINTS.ADMIN_BATCHES_RESUME_STUCK
+    );
+    return res.data;
+  },
+
+  retryImage: async (imageId: string): Promise<AdminQueuedResponse> => {
+    const res = await adminClient.post<AdminQueuedResponse>(
+      ENDPOINTS.ADMIN_IMAGE_RETRY(imageId)
+    );
+    return res.data;
   },
 
   getCostSummary: async (
@@ -163,6 +218,43 @@ export const adminApi = {
     const res = await adminClient.get<AdminUserCostRow[]>(
       ENDPOINTS.ADMIN_COSTS_BY_USER,
       { params: { period } }
+    );
+    return res.data;
+  },
+
+  getHealth: async (): Promise<AppHealthResponse> => {
+    const res = await adminClient.get<AppHealthResponse>(
+      ENDPOINTS.ADMIN_HEALTH
+    );
+    return res.data;
+  },
+
+  getHealthServices: async (): Promise<AdminHealthServicesResponse> => {
+    const res = await adminClient.get<AdminHealthServicesResponse>(
+      ENDPOINTS.ADMIN_HEALTH_SERVICES
+    );
+    return res.data;
+  },
+
+  runCleanup: async (): Promise<AdminCleanupResult> => {
+    const res = await adminClient.post<AdminCleanupResult>(
+      ENDPOINTS.ADMIN_CLEANUP_RUN
+    );
+    return res.data;
+  },
+
+  getLastCleanupRun: async (): Promise<AdminCleanupResult | null> => {
+    const res = await adminClient.get<AdminCleanupResult | null>(
+      ENDPOINTS.ADMIN_CLEANUP_LAST_RUN
+    );
+    return res.data;
+  },
+
+  wipeTenantFiles: async (
+    tenantId: string
+  ): Promise<AdminTenantFilesWipeResponse> => {
+    const res = await adminClient.delete<AdminTenantFilesWipeResponse>(
+      ENDPOINTS.ADMIN_TENANT_FILES(tenantId)
     );
     return res.data;
   },

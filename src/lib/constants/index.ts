@@ -41,13 +41,38 @@ export const ENDPOINTS = {
   ADMIN_USER: (userId: string) => `/api/v1/admin/users/${userId}`,
   ADMIN_USER_IMPERSONATE: (userId: string) =>
     `/api/v1/admin/users/${userId}/impersonate`,
+  ADMIN_USER_RESEND_VERIFICATION: (userId: string) =>
+    `/api/v1/admin/users/${userId}/resend-verification`,
+  ADMIN_USER_API_KEYS: (userId: string) =>
+    `/api/v1/admin/users/${userId}/api-keys`,
+  ADMIN_USER_API_KEY: (userId: string, keyId: string) =>
+    `/api/v1/admin/users/${userId}/api-keys/${keyId}`,
   ADMIN_BATCHES: '/api/v1/admin/batches',
   ADMIN_BATCH: (batchId: string) => `/api/v1/admin/batches/${batchId}`,
+  ADMIN_BATCH_CANCEL: (batchId: string) =>
+    `/api/v1/admin/batches/${batchId}/cancel`,
+  ADMIN_BATCH_RETRY: (batchId: string) =>
+    `/api/v1/admin/batches/${batchId}/retry`,
+  ADMIN_BATCHES_RESUME_STUCK: '/api/v1/admin/batches/resume-stuck',
+  ADMIN_IMAGE_RETRY: (imageId: string) =>
+    `/api/v1/admin/images/${imageId}/retry`,
 
   // Admin — Costs
   ADMIN_COSTS_SUMMARY: '/api/v1/admin/costs/summary',
   ADMIN_COSTS_DAILY: '/api/v1/admin/costs/daily',
   ADMIN_COSTS_BY_USER: '/api/v1/admin/costs/by-user',
+
+  // Admin — Health
+  ADMIN_HEALTH_SERVICES: '/api/v1/admin/health/services',
+  ADMIN_HEALTH: '/api/v1/admin/health',
+
+  // Admin — Cleanup
+  ADMIN_CLEANUP_RUN: '/api/v1/admin/cleanup/run',
+  ADMIN_CLEANUP_LAST_RUN: '/api/v1/admin/cleanup/last-run',
+
+  // Admin — GDPR
+  ADMIN_TENANT_FILES: (tenantId: string) =>
+    `/api/v1/admin/tenants/${tenantId}/files`,
 } as const;
 
 export const MAX_FILE_SIZE_MB = 10;
