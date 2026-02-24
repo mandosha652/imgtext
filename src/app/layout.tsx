@@ -11,13 +11,49 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://imgtext.io'
+  ),
   title: {
-    default: 'OCR Translate',
-    template: '%s | OCR Translate',
+    default: 'ImgText',
+    template: '%s | ImgText',
   },
   description:
-    'Translate text in images instantly using AI-powered OCR and translation.',
-  keywords: ['OCR', 'translation', 'image translation', 'AI', 'SaaS'],
+    'Translate text in images instantly using AI-powered OCR and translation. Supports 11 European languages.',
+  keywords: [
+    'OCR',
+    'translation',
+    'image translation',
+    'AI',
+    'SaaS',
+    'multilingual',
+  ],
+  openGraph: {
+    type: 'website',
+    siteName: 'ImgText',
+    title: 'ImgText — AI-Powered Image Translation',
+    description:
+      'Translate text in images instantly using AI-powered OCR and translation. Supports 11 European languages.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'ImgText — AI-Powered Image Translation',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ImgText — AI-Powered Image Translation',
+    description:
+      'Translate text in images instantly using AI-powered OCR and translation.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
