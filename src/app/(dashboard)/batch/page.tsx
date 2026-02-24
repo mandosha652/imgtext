@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Loader2, Layers, AlertCircle, Inbox } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
@@ -19,81 +18,11 @@ import { LanguageSelect } from '@/components/features/translate/LanguageSelect';
 import {
   MultiImageUploader,
   MultiLanguageSelect,
-  BatchProgress,
 } from '@/components/features/batch';
-import {
-  useCreateBatch,
-  useListBatches,
-  useCancelBatch,
-  useBatchStream,
-} from '@/hooks';
+import { useCreateBatch, useListBatches, useCancelBatch } from '@/hooks';
 import { MAX_TARGET_LANGUAGES, MAX_CONCURRENT_BATCHES } from '@/lib/constants';
 import { getErrorMessage } from '@/lib/utils';
-import type { BatchStatusResponse } from '@/types';
-
-// Streams SSE for one active batch and merges live counts into its status object.
-function ActiveBatchCard({
-  batch,
-  onCancel,
-  isCancelling,
-  onDone,
-}: {
-  batch: BatchStatusResponse;
-  onCancel: () => void;
-  isCancelling: boolean;
-  onDone: () => void;
-}) {
-  const isActive = batch.status === 'pending' || batch.status === 'processing';
-  const { progress } = useBatchStream(batch.batch_id, isActive);
-  const onDoneRef = useRef(onDone);
-
-  useEffect(() => {
-    onDoneRef.current = onDone;
-  }, [onDone]);
-
-  // When SSE signals completion, notify parent to refresh the list
-  useEffect(() => {
-    if (progress?.done) {
-      onDoneRef.current();
-    }
-  }, [progress?.done]);
-
-  // Overlay live SSE counts onto the batch object — keep images[] from polling
-  const merged: BatchStatusResponse = progress
-    ? {
-        ...batch,
-        status: progress.status as BatchStatusResponse['status'],
-        completed_count: progress.completed_count,
-        failed_count: progress.failed_count,
-      }
-    : batch;
-
-  return (
-    <Card key={batch.batch_id}>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <span className="relative flex h-2 w-2">
-              <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-primary relative inline-flex h-2 w-2 rounded-full" />
-            </span>
-            Running
-          </CardTitle>
-          <p className="text-muted-foreground text-xs">
-            {format(new Date(batch.created_at), 'HH:mm')}
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <BatchProgress
-          batchStatus={merged}
-          onCancel={onCancel}
-          isCancelling={isCancelling}
-        />
-      </CardContent>
-    </Card>
-  );
-}
+import { ActiveBatchCard } from './_components/active-batch-card';
 
 export default function BatchPage() {
   const [files, setFiles] = useState<File[]>([]);
