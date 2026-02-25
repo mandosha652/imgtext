@@ -161,10 +161,10 @@ export default function HelpPage() {
                   Can&apos;t find what you&apos;re looking for? Send us an email
                   and we&apos;ll get back to you.
                 </p>
-                <a href="mailto:support@ocr-translate.app" className="mt-4">
+                <a href="mailto:support@imgtext.io" className="mt-4">
                   <Button className="gap-2">
                     <Mail className="h-4 w-4" />
-                    support@ocr-translate.app
+                    support@imgtext.io
                   </Button>
                 </a>
               </CardContent>

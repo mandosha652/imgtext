@@ -101,7 +101,7 @@ export default function ApiDocsPage() {
           {/* Base URL */}
           <section className="mb-10 space-y-4">
             <h2 className="text-xl font-semibold">Base URL</h2>
-            <CodeBlock>{`https://api.ocr-translate.app`}</CodeBlock>
+            <CodeBlock>{`https://api.imgtext.io`}</CodeBlock>
             <p className="text-muted-foreground text-sm">
               All endpoints are versioned under{' '}
               <code className="bg-muted rounded px-1 py-0.5 text-xs">
@@ -186,7 +186,7 @@ export default function ApiDocsPage() {
                 </div>
                 <div>
                   <p className="mb-2 text-sm font-medium">Example (curl)</p>
-                  <CodeBlock>{`curl -X POST https://api.ocr-translate.app/api/v1/translate-image \\
+                  <CodeBlock>{`curl -X POST https://api.imgtext.io/api/v1/translate-image \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -F "image=@photo.jpg" \\
   -F "target_lang=en" \\
@@ -317,7 +317,7 @@ export default function ApiDocsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <p className="mb-2 text-sm font-medium">Example (curl)</p>
-                  <CodeBlock>{`curl https://api.ocr-translate.app/api/v1/batch/batch_abc123 \\
+                  <CodeBlock>{`curl https://api.imgtext.io/api/v1/batch/batch_abc123 \\
   -H "Authorization: Bearer YOUR_API_KEY"`}</CodeBlock>
                 </div>
                 <div>
@@ -381,7 +381,7 @@ export default function ApiDocsPage() {
                 <CardDescription>Cancel a running batch job.</CardDescription>
               </CardHeader>
               <CardContent>
-                <CodeBlock>{`curl -X POST https://api.ocr-translate.app/api/v1/batch/batch_abc123/cancel \\
+                <CodeBlock>{`curl -X POST https://api.imgtext.io/api/v1/batch/batch_abc123/cancel \\
   -H "Authorization: Bearer YOUR_API_KEY"`}</CodeBlock>
               </CardContent>
             </Card>

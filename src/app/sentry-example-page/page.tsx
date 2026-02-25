@@ -53,7 +53,7 @@ export default function Page() {
           <a
             target="_blank"
             rel="noopener"
-            href="https://ocr-translate.sentry.io/issues/?project=4510936445026304"
+            href="https://imgtext.sentry.io/issues/?project=4510936445026304"
           >
             Issues Page
           </a>
