@@ -3,19 +3,25 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from 'axios';
-import { API_BASE_URL, ENDPOINTS } from '@/lib/constants';
+import { API_BASE_URL } from '@/lib/constants';
 import { AuthTokens } from '@/types';
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'access_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
 
-// Cookie utilities
-const setCookie = (name: string, value: string, days: number = 7): void => {
+// ---------------------------------------------------------------------------
+// Access-token cookie helpers (JS-readable, short-lived)
+// The refresh_token is httpOnly and managed server-side via /api/auth/* routes.
+// ---------------------------------------------------------------------------
+
+const setCookie = (
+  name: string,
+  value: string,
+  maxAgeSeconds: number
+): void => {
   if (typeof document === 'undefined') return;
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
   const secure = location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax${secure}`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${maxAgeSeconds}; path=/; SameSite=Lax${secure}`;
 };
 
 const getCookie = (name: string): string | null => {
@@ -31,10 +37,38 @@ const getCookie = (name: string): string | null => {
 
 const deleteCookie = (name: string): void => {
   if (typeof document === 'undefined') return;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+  document.cookie = `${name}=; max-age=0; path=/`;
 };
 
-// Create axios instance
+// ---------------------------------------------------------------------------
+// Server-side route helpers (manage httpOnly refresh_token)
+// These use fetch (not apiClient) to avoid interceptor loops.
+// ---------------------------------------------------------------------------
+
+async function serverSetTokens(tokens: AuthTokens): Promise<void> {
+  try {
+    await fetch('/api/auth/set-tokens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tokens),
+    });
+  } catch {
+    // Best-effort — the access token is already set client-side
+  }
+}
+
+async function serverClearTokens(): Promise<void> {
+  try {
+    await fetch('/api/auth/clear-tokens', { method: 'POST' });
+  } catch {
+    // Best-effort
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Axios instance
+// ---------------------------------------------------------------------------
+
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -43,37 +77,36 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Token management utilities (using cookies for SSR compatibility)
+// ---------------------------------------------------------------------------
+// Token management utilities
+// ---------------------------------------------------------------------------
+
 export const tokenStorage = {
-  getAccessToken: (): string | null => {
-    return getCookie(ACCESS_TOKEN_KEY);
+  getAccessToken: (): string | null => getCookie(ACCESS_TOKEN_KEY),
+
+  setTokens: async (tokens: AuthTokens): Promise<void> => {
+    // Set the access token client-side (JS-readable, needed for Bearer header)
+    const maxAge = Math.max(tokens.expires_in ?? 900, 60);
+    setCookie(ACCESS_TOKEN_KEY, tokens.access_token, maxAge);
+    // Set the refresh token server-side as httpOnly
+    await serverSetTokens(tokens);
   },
 
-  getRefreshToken: (): string | null => {
-    return getCookie(REFRESH_TOKEN_KEY);
-  },
-
-  setTokens: (tokens: AuthTokens): void => {
-    // Calculate expiry in days from expires_in (seconds)
-    const expiryDays = tokens.expires_in ? tokens.expires_in / 86400 : 7;
-    setCookie(ACCESS_TOKEN_KEY, tokens.access_token, expiryDays);
-    setCookie(REFRESH_TOKEN_KEY, tokens.refresh_token, 30); // Refresh token lasts longer
-  },
-
-  clearTokens: (): void => {
+  clearTokens: async (): Promise<void> => {
     deleteCookie(ACCESS_TOKEN_KEY);
-    deleteCookie(REFRESH_TOKEN_KEY);
+    await serverClearTokens();
   },
 
-  hasTokens: (): boolean => {
-    return !!tokenStorage.getAccessToken();
-  },
+  hasTokens: (): boolean => !!getCookie(ACCESS_TOKEN_KEY),
 };
 
-// Request interceptor - add auth token
+// ---------------------------------------------------------------------------
+// Request interceptor — inject Bearer header from JS-readable access token
+// ---------------------------------------------------------------------------
+
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = tokenStorage.getAccessToken();
+    const token = getCookie(ACCESS_TOKEN_KEY);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -82,7 +115,15 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => Promise.reject(error)
 );
 
-// Response interceptor - handle token refresh
+// ---------------------------------------------------------------------------
+// Response interceptor — handle 401 / token refresh
+//
+// On 401 the interceptor calls the Next.js /api/auth/refresh proxy route.
+// That route reads the httpOnly refresh_token cookie server-side, exchanges it
+// with the backend, and responds with the new access_token in the body while
+// setting both new cookies (access_token JS-readable, refresh_token httpOnly).
+// ---------------------------------------------------------------------------
+
 // NOTE: These are intentionally module-level (not instance-level).
 // This file exports a single apiClient instance; the shared state is safe
 // because there is exactly one instance. Do not create additional
@@ -136,36 +177,40 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenStorage.getRefreshToken();
-      if (!refreshToken) {
-        tokenStorage.clearTokens();
-        localStorage.removeItem('auth-storage');
-        window.location.href = '/login';
-        return Promise.reject(error);
-      }
-
       try {
-        const response = await axios.post<AuthTokens>(
-          `${API_BASE_URL}${ENDPOINTS.REFRESH}`,
-          { refresh_token: refreshToken }
-        );
+        // Call our Next.js proxy route — it reads the httpOnly refresh_token
+        // cookie server-side and returns the new access_token in the body.
+        const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
 
-        const newTokens = response.data;
-        if (!newTokens?.access_token || !newTokens?.refresh_token) {
-          throw new Error('Invalid token refresh response');
+        if (!refreshRes.ok) {
+          throw new Error(`Refresh failed: ${refreshRes.status}`);
         }
-        tokenStorage.setTokens(newTokens);
 
-        processQueue(null, newTokens.access_token);
+        const refreshData = (await refreshRes.json()) as {
+          access_token: string;
+          expires_in: number;
+        };
+
+        if (!refreshData?.access_token) {
+          throw new Error('Invalid refresh response');
+        }
+
+        // The proxy route already set both cookies via Set-Cookie headers.
+        // Update the in-memory cookie value for the current page context.
+        const maxAge = Math.max(refreshData.expires_in ?? 900, 60);
+        setCookie(ACCESS_TOKEN_KEY, refreshData.access_token, maxAge);
+
+        processQueue(null, refreshData.access_token);
 
         if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${newTokens.access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${refreshData.access_token}`;
         }
 
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null);
-        tokenStorage.clearTokens();
+        deleteCookie(ACCESS_TOKEN_KEY);
+        void serverClearTokens();
         localStorage.removeItem('auth-storage');
         window.location.href = '/login';
         return Promise.reject(refreshError);

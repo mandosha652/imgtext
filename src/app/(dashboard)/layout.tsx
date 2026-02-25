@@ -4,8 +4,6 @@ import { VerificationBanner } from '@/components/layout/VerificationBanner';
 import { OfflineBanner } from '@/components/layout/OfflineBanner';
 import { DevBypassBanner } from '@/components/layout/DevBypassBanner';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   robots: {
     index: false,
@@ -18,7 +16,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Auth is handled by middleware - no client-side checks needed
+  // Auth is handled by proxy - no client-side checks needed
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardNav />

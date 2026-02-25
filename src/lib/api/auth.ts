@@ -32,8 +32,8 @@ export const authApi = {
       ENDPOINTS.REGISTER,
       data
     );
-    // Store tokens
-    tokenStorage.setTokens(response.data.tokens);
+    // Store tokens (async — refresh token set as httpOnly server-side)
+    await tokenStorage.setTokens(response.data.tokens);
     return response.data;
   },
 
@@ -42,8 +42,8 @@ export const authApi = {
    */
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post<LoginResponse>(ENDPOINTS.LOGIN, data);
-    // Store tokens
-    tokenStorage.setTokens(response.data.tokens);
+    // Store tokens (async — refresh token set as httpOnly server-side)
+    await tokenStorage.setTokens(response.data.tokens);
     return response.data;
   },
 
@@ -57,24 +57,18 @@ export const authApi = {
     } catch {
       // Best-effort revocation — always clear tokens locally
     } finally {
-      tokenStorage.clearTokens();
+      await tokenStorage.clearTokens();
     }
   },
 
   /**
-   * Refresh access token
+   * Refresh access token (used by settings page; the 401 interceptor uses
+   * the /api/auth/refresh proxy route directly)
    */
   refreshToken: async (): Promise<AuthTokens> => {
-    const refreshToken = tokenStorage.getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    const response = await apiClient.post<AuthTokens>(ENDPOINTS.REFRESH, {
-      refresh_token: refreshToken,
-    });
-    tokenStorage.setTokens(response.data);
-    return response.data;
+    const res = await fetch('/api/auth/refresh', { method: 'POST' });
+    if (!res.ok) throw new Error('Token refresh failed');
+    return res.json() as Promise<AuthTokens>;
   },
 
   /**

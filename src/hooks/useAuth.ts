@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { authApi, tokenStorage } from '@/lib/api';
+import { authApi, tokenStorage, adminKeyStorage } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { shouldBypassAuth } from '@/config/env';
 import type { LoginRequest, RegisterRequest } from '@/types';
@@ -31,7 +31,7 @@ export function useAuth() {
         setUser(userData);
         return userData;
       } catch {
-        tokenStorage.clearTokens();
+        await tokenStorage.clearTokens();
         setUser(null);
         router.push('/login');
         return null;
@@ -64,12 +64,29 @@ export function useAuth() {
     },
   });
 
-  // Logout handler
+  // Logout handler — clears all auth state including admin key
   const handleLogout = useCallback(async () => {
     await authApi.logout();
     logout();
+    adminKeyStorage.clear();
     queryClient.clear();
     router.push('/login');
+  }, [logout, queryClient, router]);
+
+  // Cross-tab logout sync — if another tab clears auth-storage, redirect here too
+  useEffect(() => {
+    if (shouldBypassAuth) return;
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'auth-storage' && event.newValue === null) {
+        logout();
+        queryClient.clear();
+        router.push('/login');
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [logout, queryClient, router]);
 
   // Initialize auth state

@@ -31,7 +31,8 @@ export function AdminAuthGate({ onAuthenticated }: AdminAuthGateProps) {
     }
     adminKeyStorage.set(key.trim());
     // Set a session cookie so middleware can guard /admin routes server-side
-    document.cookie = 'admin_authenticated=1; path=/; SameSite=Strict';
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `admin_authenticated=1; path=/; SameSite=Strict${secure}`;
     onAuthenticated();
   };
 

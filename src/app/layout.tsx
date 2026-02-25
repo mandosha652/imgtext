@@ -34,21 +34,12 @@ export const metadata: Metadata = {
     title: 'ImgText — AI-Powered Image Translation',
     description:
       'Translate text in images instantly using AI-powered OCR and translation. Supports 11 European languages.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'ImgText — AI-Powered Image Translation',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ImgText — AI-Powered Image Translation',
     description:
       'Translate text in images instantly using AI-powered OCR and translation.',
-    images: ['/og-image.png'],
   },
   robots: {
     index: true,
