@@ -35,6 +35,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  env: {
+    MAINTENANCE_MODE: process.env.MAINTENANCE_MODE || 'false',
+    MAINTENANCE_SECRET: process.env.MAINTENANCE_SECRET || '',
+  },
   turbopack: {
     root: __dirname,
   },
