@@ -19,6 +19,65 @@ const adminRoutes = ['/admin'];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Maintenance mode: block all visitors unless they have the bypass cookie
+  const maintenanceMode = process.env.MAINTENANCE_MODE === 'true';
+  const maintenanceSecret = process.env.MAINTENANCE_SECRET || '';
+
+  if (maintenanceMode) {
+    // Allow the maintenance page itself
+    if (pathname === '/maintenance') {
+      return NextResponse.next();
+    }
+
+    // Check for bypass cookie
+    const bypassCookie = request.cookies.get('maintenance_bypass')?.value;
+    if (bypassCookie === maintenanceSecret && maintenanceSecret) {
+      return NextResponse.next();
+    }
+
+    // Check if visitor is providing the secret via query param to bypass
+    const urlSecret = request.nextUrl.searchParams.get('secret');
+    if (urlSecret === maintenanceSecret && maintenanceSecret) {
+      const response = NextResponse.redirect(new URL(pathname, request.url));
+      response.cookies.set('maintenance_bypass', maintenanceSecret, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
+      return response;
+    }
+
+    // Block everyone else — return a simple maintenance response
+    return new NextResponse(
+      `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ImgText — Coming Soon</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090b; color: #fafafa; }
+    .container { text-align: center; padding: 2rem; }
+    h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+    p { font-size: 1.125rem; color: #a1a1aa; max-width: 400px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ImgText</h1>
+    <p>We're working on something great. Check back soon.</p>
+  </div>
+</body>
+</html>`,
+      {
+        status: 503,
+        headers: { 'Content-Type': 'text/html', 'Retry-After': '86400' },
+      }
+    );
+  }
+
   // Check for dev auth bypass
   const devAuthBypass = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === 'true';
 

@@ -1,6 +1,6 @@
-# OCR Translate Frontend
+# ImgText
 
-A modern Next.js 16 SaaS frontend for the OCR Translate Engine backend. Translate text in images to multiple languages with an Apple-inspired minimal design.
+A modern Next.js 16 SaaS frontend for the ImgText Engine backend. Translate text in images to multiple languages with an Apple-inspired minimal design.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![React](https://img.shields.io/badge/React-19-blue)
@@ -23,14 +23,14 @@ A modern Next.js 16 SaaS frontend for the OCR Translate Engine backend. Translat
 ### Prerequisites
 
 - Node.js 18+ and Yarn
-- Backend API running (see [ocr-translate-engine](https://github.com/yourusername/ocr-translate-engine))
+- Backend API running (see [imgtext-engine](https://github.com/mandosha652/imgtext-engine))
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ocr-translate-frontend.git
-cd ocr-translate-frontend
+git clone git@github-personal:mandosha652/imgtext.git
+cd imgtext
 
 # Install dependencies
 yarn install
@@ -234,7 +234,7 @@ vercel --prod
 
 ## API Integration
 
-This frontend connects to the [ocr-translate-engine](https://github.com/yourusername/ocr-translate-engine) backend.
+This frontend connects to the [imgtext-engine](https://github.com/mandosha652/imgtext-engine) backend.
 
 **Required Backend Endpoints:**
 
@@ -292,8 +292,8 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-- 📧 Email: support@yourdomain.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/ocr-translate-frontend/issues)
+- 📧 Email: support@imgtext.io
+- 🐛 Issues: [GitHub Issues](https://github.com/mandosha652/imgtext/issues)
 - 📖 Docs: See CLAUDE.md for development guidelines
 
 ## Roadmap
