@@ -41,6 +41,7 @@ function LoginForm() {
       ? rawCallback
       : '/dashboard';
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
@@ -51,6 +52,7 @@ function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setLoginError(null);
     try {
       await loginAsync(data, callbackUrl);
       toast.success('Welcome back!');
@@ -70,9 +72,10 @@ function LoginForm() {
       }
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast.error(
-        axiosError.response?.data?.detail || 'Invalid email or password'
-      );
+      const msg =
+        axiosError.response?.data?.detail || 'Invalid email or password';
+      toast.error(msg);
+      setLoginError(msg);
     }
   };
 
@@ -149,6 +152,11 @@ function LoginForm() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-6 sm:pt-6">
+            {loginError && (
+              <p className="text-destructive w-full text-center text-sm">
+                {loginError}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={isLoggingIn}>
               {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign in

@@ -74,7 +74,7 @@ export function ImageUploader({
           <div className="relative h-24 w-24 overflow-hidden rounded-lg border shadow-sm">
             <Image
               src={preview}
-              alt="Preview"
+              alt={selectedFile.name}
               fill
               className="object-cover"
               unoptimized
