@@ -30,8 +30,8 @@ function handleMaintenance(request: NextRequest): NextResponse | null {
     return NextResponse.next();
   }
 
-  // Bypass via ?secret= query param — sets cookie for future requests
-  if (secret && request.nextUrl.searchParams.get('secret') === secret) {
+  // Bypass via X-Maintenance-Bypass header — sets cookie for future requests
+  if (secret && request.headers.get('x-maintenance-bypass') === secret) {
     const response = NextResponse.redirect(new URL(pathname, request.url));
     response.cookies.set('maintenance_bypass', secret, {
       httpOnly: true,
